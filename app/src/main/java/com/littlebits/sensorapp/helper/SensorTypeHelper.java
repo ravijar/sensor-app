@@ -88,6 +88,7 @@ public class SensorTypeHelper {
             case Sensor.TYPE_ACCELEROMETER_LIMITED_AXES_UNCALIBRATED:
             case Sensor.TYPE_ACCELEROMETER_UNCALIBRATED:
             case Sensor.TYPE_AMBIENT_TEMPERATURE:
+            case Sensor.TYPE_DEVICE_PRIVATE_BASE:
             case Sensor.TYPE_GYROSCOPE:
             case Sensor.TYPE_GYROSCOPE_LIMITED_AXES:
             case Sensor.TYPE_GYROSCOPE_LIMITED_AXES_UNCALIBRATED:
@@ -101,6 +102,7 @@ public class SensorTypeHelper {
             case Sensor.TYPE_HEART_RATE:
             case Sensor.TYPE_HEART_BEAT:
             case Sensor.TYPE_HINGE_ANGLE:
+            case Sensor.TYPE_LOW_LATENCY_OFFBODY_DETECT:
                 return "Hardware";
 
             case Sensor.TYPE_GRAVITY:
@@ -113,6 +115,10 @@ public class SensorTypeHelper {
             case Sensor.TYPE_STEP_COUNTER:
             case Sensor.TYPE_MOTION_DETECT:
             case Sensor.TYPE_STATIONARY_DETECT:
+            case Sensor.TYPE_POSE_6DOF:
+            case Sensor.TYPE_ORIENTATION:
+            case Sensor.TYPE_HEADING:
+            case Sensor.TYPE_HEAD_TRACKER:
                 return "Software";
 
             default:
