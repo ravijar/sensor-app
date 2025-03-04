@@ -4,17 +4,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-import android.widget.TextView;
+import com.littlebits.sensorapp.helper.SensorManagerHelper;
 
 public class LightSensor implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor lightSensor;
-    private TextView activityText;
+    private SensorManagerHelper sensorHelper;
 
-    public LightSensor(SensorManager sensorManager, TextView activityText) {
+    public LightSensor(SensorManager sensorManager, SensorManagerHelper sensorHelper) {
         this.sensorManager = sensorManager;
-        this.activityText = activityText;
+        this.sensorHelper = sensorHelper;
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
     }
 
@@ -30,10 +29,7 @@ public class LightSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] > 10000) {
-            activityText.setText("Out in the Sun");
-            Log.d("LightSensor", "Out in the Sun");
-        }
+        sensorHelper.updateLight(event.values[0]);
     }
 
     @Override

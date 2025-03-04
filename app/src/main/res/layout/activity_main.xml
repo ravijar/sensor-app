@@ -6,11 +6,83 @@
     android:gravity="center"
     android:padding="20dp">
 
+    <!-- Predicted Activity Title-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Predicted Activity"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:paddingBottom="5dp"/>
+
+    <!-- Predicted Activity -->
     <TextView
         android:id="@+id/activityText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Detecting Activity..."
+        android:text="Unknown"
         android:textSize="20sp"
-        android:textStyle="bold"/>
+        android:textStyle="italic"
+        android:textColor="@android:color/holo_blue_dark"
+        android:paddingBottom="20dp"/>
+
+    <!-- Accelerometer Sensor Values -->
+    <TextView
+        android:id="@+id/accelXText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accel X: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <TextView
+        android:id="@+id/accelYText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accel Y: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <TextView
+        android:id="@+id/accelZText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accel Z: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <!-- Gyroscope Sensor Values -->
+    <TextView
+        android:id="@+id/gyroXText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gyro X: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <TextView
+        android:id="@+id/gyroYText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gyro Y: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <TextView
+        android:id="@+id/gyroZText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gyro Z: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
+    <!-- Light Sensor Value -->
+    <TextView
+        android:id="@+id/lightText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light: N/A"
+        android:textSize="18sp"
+        android:padding="5dp"/>
+
 </LinearLayout>

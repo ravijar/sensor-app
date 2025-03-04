@@ -4,17 +4,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-import android.widget.TextView;
+import com.littlebits.sensorapp.helper.SensorManagerHelper;
 
 public class GyroscopeSensor implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor gyroscope;
-    private TextView activityText;
+    private SensorManagerHelper sensorHelper;
 
-    public GyroscopeSensor(SensorManager sensorManager, TextView activityText) {
+    public GyroscopeSensor(SensorManager sensorManager, SensorManagerHelper sensorHelper) {
         this.sensorManager = sensorManager;
-        this.activityText = activityText;
+        this.sensorHelper = sensorHelper;
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
@@ -30,10 +29,7 @@ public class GyroscopeSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (Math.abs(event.values[0]) > 2 || Math.abs(event.values[1]) > 2 || Math.abs(event.values[2]) > 2) {
-            activityText.setText("Phone Held in Hand");
-            Log.d("Gyroscope", "Phone Held in Hand");
-        }
+        sensorHelper.updateGyroscope(event.values[0], event.values[1], event.values[2]);
     }
 
     @Override

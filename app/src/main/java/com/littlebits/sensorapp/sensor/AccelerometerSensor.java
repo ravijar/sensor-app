@@ -4,17 +4,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-import android.widget.TextView;
+import com.littlebits.sensorapp.helper.SensorManagerHelper;
 
 public class AccelerometerSensor implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private TextView activityText;
+    private SensorManagerHelper sensorHelper;
 
-    public AccelerometerSensor(SensorManager sensorManager, TextView activityText) {
+    public AccelerometerSensor(SensorManager sensorManager, SensorManagerHelper sensorHelper) {
         this.sensorManager = sensorManager;
-        this.activityText = activityText;
+        this.sensorHelper = sensorHelper;
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
@@ -30,21 +29,7 @@ public class AccelerometerSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-
-        float acceleration = (float) Math.sqrt(x*x + y*y + z*z);
-
-        String detectedActivity = "Unknown";
-        if (acceleration > 12) {
-            detectedActivity = "Walking / Moving";
-        } else if (acceleration < 9.8) {
-            detectedActivity = "Stationary";
-        }
-
-        activityText.setText("Detected Activity: " + detectedActivity);
-        Log.d("Accelerometer", detectedActivity);
+        sensorHelper.updateAccelerometer(event.values[0], event.values[1], event.values[2]);
     }
 
     @Override
