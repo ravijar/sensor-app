@@ -1,6 +1,5 @@
 package com.littlebits.sensorapp;
 
-import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,14 +10,15 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.littlebits.sensorapp.helper.SensorUIHelper;
 
-public class SensorDetailsActivity extends Activity implements SensorEventListener {
+public class SensorDetailsActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor sensor;
     private int sensorType;
     private TextView sensorTitle;
-    private Button backButton;
     private LinearLayout sensorValueContainer;
     private SensorUIHelper sensorUIHelper;
 
@@ -38,9 +38,11 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
         }
 
         // Initialize UI components
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Sensor Readings");
+        }
         sensorTitle = findViewById(R.id.sensorTitle);
         sensorValueContainer = findViewById(R.id.sensorValueContainer);
-        backButton = findViewById(R.id.backButton);
         sensorUIHelper = new SensorUIHelper();
         sensorTitle.setText(sensor.getName());
 
@@ -49,9 +51,6 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
         if (sensorView != null) {
             sensorValueContainer.addView(sensorView);
         }
-
-        // Back button functionality
-        backButton.setOnClickListener(v -> finish());
     }
 
     @Override

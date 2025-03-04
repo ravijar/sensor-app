@@ -5,15 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Available Sensors"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:paddingBottom="10dp"/>
-
     <!-- List of Sensors -->
     <ListView
         android:id="@+id/sensorList"
@@ -21,10 +12,4 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <!-- Back Button -->
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"/>
 </LinearLayout>

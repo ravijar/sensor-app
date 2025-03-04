@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +22,6 @@ import java.util.List;
 public class AvailableSensorsActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private ListView sensorListView;
-    private Button backButton;
     private List<Sensor> sensorList;
     private List<Sensor> knownSensors;
     private List<Sensor> unknownSensors;
@@ -33,8 +31,11 @@ public class AvailableSensorsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensors);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Available Sensors");
+        }
+
         sensorListView = findViewById(R.id.sensorList);
-        backButton = findViewById(R.id.backButton);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -105,8 +106,5 @@ public class AvailableSensorsActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // Back button functionality
-        backButton.setOnClickListener(v -> finish());
     }
 }
