@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.littlebits.sensorapp.helper.SensorTypeHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AvailableSensorsActivity extends AppCompatActivity {
@@ -24,6 +25,8 @@ public class AvailableSensorsActivity extends AppCompatActivity {
     private ListView sensorListView;
     private Button backButton;
     private List<Sensor> sensorList;
+    private List<Sensor> knownSensors;
+    private List<Sensor> unknownSensors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +37,26 @@ public class AvailableSensorsActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        List<Sensor> allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
 
-        // Custom Adapter inside the Activity
+        // Separate known and unknown sensors
+        knownSensors = new ArrayList<>();
+        unknownSensors = new ArrayList<>();
+
+        for (Sensor sensor : allSensors) {
+            String sensorTypeName = SensorTypeHelper.getSensorTypeName(sensor.getType());
+            if (sensorTypeName.equals("Unknown")) {
+                unknownSensors.add(sensor);
+            } else {
+                knownSensors.add(sensor);
+            }
+        }
+
+        // Merge the lists: known sensors first, unknown sensors at the end
+        sensorList = new ArrayList<>(knownSensors);
+        sensorList.addAll(unknownSensors);
+
+        // Custom Adapter
         ArrayAdapter<Sensor> adapter = new ArrayAdapter<Sensor>(this, R.layout.item_sensor, sensorList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -56,6 +76,15 @@ public class AvailableSensorsActivity extends AppCompatActivity {
                 sensorType.setText(SensorTypeHelper.getSensorTypeName(sensor.getType()));
                 sensorCategory.setText(SensorTypeHelper.getSensorCategory(sensor.getType()));
 
+                // Check if sensor is unknown
+                if (unknownSensors.contains(sensor)) {
+                    convertView.setEnabled(false);  // Disable clicking
+                    convertView.setAlpha(0.5f);  // Reduce opacity to indicate it's disabled
+                } else {
+                    convertView.setEnabled(true);
+                    convertView.setAlpha(1.0f);
+                }
+
                 return convertView;
             }
         };
@@ -68,10 +97,12 @@ public class AvailableSensorsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Sensor selectedSensor = sensorList.get(position);
 
-                // Open SensorDetailsActivity and pass sensor type
-                Intent intent = new Intent(AvailableSensorsActivity.this, SensorDetailsActivity.class);
-                intent.putExtra("sensorType", selectedSensor.getType());
-                startActivity(intent);
+                // Only allow clicks for known sensors
+                if (!unknownSensors.contains(selectedSensor)) {
+                    Intent intent = new Intent(AvailableSensorsActivity.this, SensorDetailsActivity.class);
+                    intent.putExtra("sensorType", selectedSensor.getType());
+                    startActivity(intent);
+                }
             }
         });
 

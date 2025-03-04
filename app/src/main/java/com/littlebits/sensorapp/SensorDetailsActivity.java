@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.littlebits.sensorapp.helper.SensorUIHelper;
 
@@ -16,6 +17,7 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor sensor;
     private int sensorType;
+    private TextView sensorTitle;
     private Button backButton;
     private LinearLayout sensorValueContainer;
     private SensorUIHelper sensorUIHelper;
@@ -36,9 +38,11 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
         }
 
         // Initialize UI components
+        sensorTitle = findViewById(R.id.sensorTitle);
         sensorValueContainer = findViewById(R.id.sensorValueContainer);
         backButton = findViewById(R.id.backButton);
         sensorUIHelper = new SensorUIHelper();
+        sensorTitle.setText(sensor.getName());
 
         // Inflate and add the sensor-specific UI
         View sensorView = sensorUIHelper.inflateSensorView(this, sensorType, sensorValueContainer);
