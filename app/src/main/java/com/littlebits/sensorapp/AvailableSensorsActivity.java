@@ -51,7 +51,7 @@ public class AvailableSensorsActivity extends AppCompatActivity {
                 // Set sensor values
                 sensorName.setText(sensor.getName());
                 sensorType.setText(SensorTypeHelper.getSensorTypeName(sensor.getType()));
-                sensorCategory.setText(SensorTypeHelper.isHardwareSensor(sensor) ? "Hardware" : "Software");
+                sensorCategory.setText(SensorTypeHelper.getSensorCategory(sensor.getType()));
 
                 return convertView;
             }
