@@ -6,19 +6,19 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.littlebits.sensorapp.helper.SensorUIHelper;
 
 public class SensorDetailsActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor sensor;
-    private TextView valueX, valueY, valueZ, lightValue;
     private int sensorType;
     private Button backButton;
     private LinearLayout sensorValueContainer;
+    private SensorUIHelper sensorUIHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,28 +35,13 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
             return;
         }
 
+        // Initialize UI components
         sensorValueContainer = findViewById(R.id.sensorValueContainer);
         backButton = findViewById(R.id.backButton);
+        sensorUIHelper = new SensorUIHelper();
 
-        // Inflate sensor-specific layout dynamically
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View sensorView = null;
-
-        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-            sensorView = inflater.inflate(R.layout.item_accelerometer, sensorValueContainer, false);
-            valueX = sensorView.findViewById(R.id.accelX);
-            valueY = sensorView.findViewById(R.id.accelY);
-            valueZ = sensorView.findViewById(R.id.accelZ);
-        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            sensorView = inflater.inflate(R.layout.item_gyroscope, sensorValueContainer, false);
-            valueX = sensorView.findViewById(R.id.gyroX);
-            valueY = sensorView.findViewById(R.id.gyroY);
-            valueZ = sensorView.findViewById(R.id.gyroZ);
-        } else if (sensorType == Sensor.TYPE_LIGHT) {
-            sensorView = inflater.inflate(R.layout.item_light_sensor, sensorValueContainer, false);
-            lightValue = sensorView.findViewById(R.id.lightValue);
-        }
-
+        // Inflate and add the sensor-specific UI
+        View sensorView = sensorUIHelper.inflateSensorView(this, sensorType, sensorValueContainer);
         if (sensorView != null) {
             sensorValueContainer.addView(sensorView);
         }
@@ -81,17 +66,7 @@ public class SensorDetailsActivity extends Activity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-            valueX.setText("X: " + event.values[0]);
-            valueY.setText("Y: " + event.values[1]);
-            valueZ.setText("Z: " + event.values[2]);
-        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            valueX.setText("X: " + event.values[0]);
-            valueY.setText("Y: " + event.values[1]);
-            valueZ.setText("Z: " + event.values[2]);
-        } else if (sensorType == Sensor.TYPE_LIGHT) {
-            lightValue.setText("Light: " + event.values[0]);
-        }
+        sensorUIHelper.updateSensorValues(sensorType, event.values);
     }
 
     @Override
