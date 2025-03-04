@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView android:id="@+id/azimuth" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Azimuth: "/>
+    <TextView android:id="@+id/pitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pitch: "/>
+    <TextView android:id="@+id/roll" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Roll: "/>
+</LinearLayout>

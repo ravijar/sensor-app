@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView android:id="@+id/accelX" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="X: "/>
+    <TextView android:id="@+id/accelY" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Y: "/>
+    <TextView android:id="@+id/accelZ" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Z: "/>
+    <TextView android:id="@+id/quarX" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quaternion X: "/>
+    <TextView android:id="@+id/quarY" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quaternion Y: "/>
+    <TextView android:id="@+id/quarZ" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quaternion Z: "/>
+</LinearLayout>
