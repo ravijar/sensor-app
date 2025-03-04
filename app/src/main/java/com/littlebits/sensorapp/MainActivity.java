@@ -1,7 +1,9 @@
 package com.littlebits.sensorapp;
 
+import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.littlebits.sensorapp.helper.SensorManagerHelper;
@@ -44,5 +46,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         sensorHelper.unregisterSensors();
+    }
+
+    public void openAvailableSensors(View view) {
+        Intent intent = new Intent(this, AvailableSensorsActivity.class);
+        startActivity(intent);
     }
 }
