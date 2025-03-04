@@ -1,10 +1,12 @@
 package com.littlebits.sensorapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -21,6 +23,7 @@ public class AvailableSensorsActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private ListView sensorListView;
     private Button backButton;
+    private List<Sensor> sensorList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,7 @@ public class AvailableSensorsActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
 
         // Custom Adapter inside the Activity
         ArrayAdapter<Sensor> adapter = new ArrayAdapter<Sensor>(this, R.layout.item_sensor, sensorList) {
@@ -58,6 +61,19 @@ public class AvailableSensorsActivity extends AppCompatActivity {
         };
 
         sensorListView.setAdapter(adapter);
+
+        // Handle sensor item click - Open SensorDetailsActivity
+        sensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Sensor selectedSensor = sensorList.get(position);
+
+                // Open SensorDetailsActivity and pass sensor type
+                Intent intent = new Intent(AvailableSensorsActivity.this, SensorDetailsActivity.class);
+                intent.putExtra("sensorType", selectedSensor.getType());
+                startActivity(intent);
+            }
+        });
 
         // Back button functionality
         backButton.setOnClickListener(v -> finish());
