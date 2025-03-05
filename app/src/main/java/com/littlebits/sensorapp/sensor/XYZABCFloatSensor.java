@@ -4,12 +4,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-import com.littlebits.sensorapp.sensor.value.XYZBiasFloat;
+import com.littlebits.sensorapp.sensor.value.XYZABCFloat;
 
-public abstract class XYZBiasFloatSensor extends BaseSensor implements XYZBiasFloat {
-    private float x,y,z,biasX,biasY,biasZ = 0;
+public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloat {
+    private float x,y,z,a,b,c = 0;
 
-    public XYZBiasFloatSensor(SensorManager sensorManager, int sensorType) {
+    public XYZABCFloatSensor(SensorManager sensorManager, int sensorType) {
         super(sensorManager, sensorType);
     }
 
@@ -18,9 +18,9 @@ public abstract class XYZBiasFloatSensor extends BaseSensor implements XYZBiasFl
         setX(event.values[0]);
         setY(event.values[1]);
         setZ(event.values[2]);
-        setBiasX(event.values[3]);
-        setBiasY(event.values[4]);
-        setBiasZ(event.values[5]);
+        setA(event.values[3]);
+        setB(event.values[4]);
+        setC(event.values[5]);
         notifyObservers();
     }
 
@@ -43,18 +43,18 @@ public abstract class XYZBiasFloatSensor extends BaseSensor implements XYZBiasFl
     }
 
     @Override
-    public float getBiasX() {
-        return biasX;
+    public float getA() {
+        return a;
     }
 
     @Override
-    public float getBiasY() {
-        return biasY;
+    public float getB() {
+        return b;
     }
 
     @Override
-    public float getBiasZ() {
-        return biasZ;
+    public float getC() {
+        return c;
     }
 
     @Override
@@ -73,17 +73,17 @@ public abstract class XYZBiasFloatSensor extends BaseSensor implements XYZBiasFl
     }
 
     @Override
-    public void setBiasX(float biasX) {
-        this.biasX = biasX;
+    public void setA(float a) {
+        this.a = a;
     }
 
     @Override
-    public void setBiasY(float biasY) {
-        this.biasY = biasY;
+    public void setB(float b) {
+        this.b = b;
     }
 
     @Override
-    public void setBiasZ(float biasZ) {
-        this.biasZ = biasZ;
+    public void setC(float c) {
+        this.c = c;
     }
 }

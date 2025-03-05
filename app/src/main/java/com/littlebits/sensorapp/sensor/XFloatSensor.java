@@ -4,18 +4,18 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-import com.littlebits.sensorapp.sensor.value.ValueFloat;
+import com.littlebits.sensorapp.sensor.value.XFloat;
 
-public abstract class ValueFloatSensor extends BaseSensor implements ValueFloat {
-    private float value = 0;
+public abstract class XFloatSensor extends BaseSensor implements XFloat {
+    private float x = 0;
 
-    public ValueFloatSensor(SensorManager sensorManager, int sensorType) {
+    public XFloatSensor(SensorManager sensorManager, int sensorType) {
         super(sensorManager, sensorType);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        setValue(event.values[0]);
+        setX(event.values[0]);
         notifyObservers();
     }
 
@@ -23,12 +23,12 @@ public abstract class ValueFloatSensor extends BaseSensor implements ValueFloat 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     @Override
-    public float getValue() {
-        return value;
+    public float getX() {
+        return x;
     }
 
     @Override
-    public void setValue(float value) {
-        this.value = value;
+    public void setX(float x) {
+        this.x = x;
     }
 }
