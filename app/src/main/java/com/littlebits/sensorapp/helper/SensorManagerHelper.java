@@ -3,15 +3,17 @@ package com.littlebits.sensorapp.helper;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.widget.TextView;
-import com.littlebits.sensorapp.sensor.AccelerometerSensor;
-import com.littlebits.sensorapp.sensor.GyroscopeSensor;
-import com.littlebits.sensorapp.sensor.LightSensor;
+import com.littlebits.sensorapp.sensor.Accelerometer;
+import com.littlebits.sensorapp.sensor.Gyroscope;
+import com.littlebits.sensorapp.sensor.Light;
+import com.littlebits.sensorapp.sensor.SensorObserver;
+
 import java.util.Map;
 
-public class SensorManagerHelper {
-    private AccelerometerSensor accelerometerSensor;
-    private GyroscopeSensor gyroscopeSensor;
-    private LightSensor lightSensor;
+public class SensorManagerHelper implements SensorObserver {
+    private Accelerometer accelerometer;
+    private Gyroscope gyroscope;
+    private Light light;
 
     private float accelX = 0, accelY = 0, accelZ = 0;
     private float gyroX = 0, gyroY = 0, gyroZ = 0;
@@ -22,48 +24,25 @@ public class SensorManagerHelper {
     public SensorManagerHelper(SensorManager sensorManager, Map<String, TextView> sensorTextViews, Context context) {
         this.sensorTextViews = sensorTextViews;
 
-        accelerometerSensor = new AccelerometerSensor(sensorManager, this);
-        gyroscopeSensor = new GyroscopeSensor(sensorManager, this);
-        lightSensor = new LightSensor(sensorManager, this);
+        accelerometer = new Accelerometer(sensorManager);
+        gyroscope = new Gyroscope(sensorManager);
+        light = new Light(sensorManager);
+
+        accelerometer.addObserver(this);
+        gyroscope.addObserver(this);
+        light.addObserver(this);
     }
 
     public void registerSensors() {
-        accelerometerSensor.register();
-        gyroscopeSensor.register();
-        lightSensor.register();
+        accelerometer.register();
+        gyroscope.register();
+        light.register();
     }
 
     public void unregisterSensors() {
-        accelerometerSensor.unregister();
-        gyroscopeSensor.unregister();
-        lightSensor.unregister();
-    }
-
-    // Receive raw values from sensors and update UI dynamically
-    public void updateAccelerometer(float x, float y, float z) {
-        accelX = x;
-        accelY = y;
-        accelZ = z;
-        updateText("accelX", "Accel X: " + accelX);
-        updateText("accelY", "Accel Y: " + accelY);
-        updateText("accelZ", "Accel Z: " + accelZ);
-        predictActivity();
-    }
-
-    public void updateGyroscope(float x, float y, float z) {
-        gyroX = x;
-        gyroY = y;
-        gyroZ = z;
-        updateText("gyroX", "Gyro X: " + gyroX);
-        updateText("gyroY", "Gyro Y: " + gyroY);
-        updateText("gyroZ", "Gyro Z: " + gyroZ);
-        predictActivity();
-    }
-
-    public void updateLight(float value) {
-        lightValue = value;
-        updateText("light", "Light: " + lightValue);
-        predictActivity();
+        accelerometer.unregister();
+        gyroscope.unregister();
+        light.unregister();
     }
 
     // Process sensor values to predict activity
@@ -95,5 +74,30 @@ public class SensorManagerHelper {
         if (sensorTextViews.containsKey(key)) {
             sensorTextViews.get(key).setText(text);
         }
+    }
+
+    @Override
+    public void onSensorChanged() {
+        accelX = accelerometer.getX();
+        accelY = accelerometer.getY();
+        accelZ = accelerometer.getZ();
+
+        gyroX = gyroscope.getX();
+        gyroY = gyroscope.getY();
+        gyroZ = gyroscope.getZ();
+
+        lightValue = light.getValue();
+
+        updateText("accelX", "Accel X: " + accelX);
+        updateText("accelY", "Accel Y: " + accelY);
+        updateText("accelZ", "Accel Z: " + accelZ);
+
+        updateText("gyroX", "Gyro X: " + gyroX);
+        updateText("gyroY", "Gyro Y: " + gyroY);
+        updateText("gyroZ", "Gyro Z: " + gyroZ);
+
+        updateText("light", "Light: " + lightValue);
+
+        predictActivity();
     }
 }
