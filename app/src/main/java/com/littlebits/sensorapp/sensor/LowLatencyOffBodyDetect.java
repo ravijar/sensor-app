@@ -1,0 +1,12 @@
+package com.littlebits.sensorapp.sensor;
+
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+
+public class LowLatencyOffBodyDetect extends ValueFloatSensor {
+
+    public LowLatencyOffBodyDetect(SensorManager sensorManager) {
+        super(sensorManager, Sensor.TYPE_LOW_LATENCY_OFFBODY_DETECT);
+    }
+
+}
