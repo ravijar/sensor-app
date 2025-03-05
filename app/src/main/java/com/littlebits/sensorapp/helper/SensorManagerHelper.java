@@ -86,7 +86,7 @@ public class SensorManagerHelper implements SensorObserver {
         gyroY = gyroscope.getY();
         gyroZ = gyroscope.getZ();
 
-        lightValue = light.getValue();
+        lightValue = light.getX();
 
         updateText("accelX", "Accel X: " + accelX);
         updateText("accelY", "Accel Y: " + accelY);

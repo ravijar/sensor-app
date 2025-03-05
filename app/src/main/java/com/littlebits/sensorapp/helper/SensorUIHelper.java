@@ -17,6 +17,95 @@ public class SensorUIHelper {
         View sensorView = null;
 
         switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+            case Sensor.TYPE_GRAVITY:
+            case Sensor.TYPE_GYROSCOPE:
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+            case Sensor.TYPE_MAGNETIC_FIELD:
+            case Sensor.TYPE_GAME_ROTATION_VECTOR:
+            case Sensor.TYPE_ROTATION_VECTOR:
+                sensorView = inflater.inflate(R.layout.item_accelerometer, sensorValueContainer, false);
+                valueX = sensorView.findViewById(R.id.accelX);
+                valueY = sensorView.findViewById(R.id.accelY);
+                valueZ = sensorView.findViewById(R.id.accelZ);
+                break;
+
+            case Sensor.TYPE_ACCELEROMETER_LIMITED_AXES:
+            case Sensor.TYPE_ACCELEROMETER_LIMITED_AXES_UNCALIBRATED:
+            case Sensor.TYPE_GYROSCOPE_LIMITED_AXES:
+            case Sensor.TYPE_GYROSCOPE_LIMITED_AXES_UNCALIBRATED:
+                sensorView = inflater.inflate(R.layout.item_accelerometer_limited, sensorValueContainer, false);
+                valueX = sensorView.findViewById(R.id.accelX);
+                valueY = sensorView.findViewById(R.id.accelY);
+                break;
+
+            case Sensor.TYPE_ACCELEROMETER_UNCALIBRATED:
+            case Sensor.TYPE_GYROSCOPE_UNCALIBRATED:
+            case Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED:
+                sensorView = inflater.inflate(R.layout.item_accelerometer_bias, sensorValueContainer, false);
+                valueX = sensorView.findViewById(R.id.accelX);
+                valueY = sensorView.findViewById(R.id.accelY);
+                valueZ = sensorView.findViewById(R.id.accelZ);
+                biasX = sensorView.findViewById(R.id.biasX);
+                biasY = sensorView.findViewById(R.id.biasY);
+                biasZ = sensorView.findViewById(R.id.biasZ);
+                break;
+
+            case Sensor.TYPE_AMBIENT_TEMPERATURE:
+            case Sensor.TYPE_TEMPERATURE:
+                sensorView = inflater.inflate(R.layout.item_temperature, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.temperatureValue);
+                break;
+
+            case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+            case Sensor.TYPE_HEAD_TRACKER:
+                sensorView = inflater.inflate(R.layout.item_head_tracker, sensorValueContainer, false);
+                valueX = sensorView.findViewById(R.id.rotX);
+                valueY = sensorView.findViewById(R.id.rotY);
+                valueZ = sensorView.findViewById(R.id.rotZ);
+                value = sensorView.findViewById(R.id.scalar);
+                break;
+
+            case Sensor.TYPE_HEADING:
+                sensorView = inflater.inflate(R.layout.item_heading, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.headingValue);
+                break;
+
+            case Sensor.TYPE_HEART_BEAT:
+                sensorView = inflater.inflate(R.layout.item_heart_beat, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.heartBeatValue);
+                break;
+
+            case Sensor.TYPE_HEART_RATE:
+                sensorView = inflater.inflate(R.layout.item_heart_rate, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.heartRateValue);
+                break;
+
+            case Sensor.TYPE_HINGE_ANGLE:
+                sensorView = inflater.inflate(R.layout.item_hinge_angle, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.hingeAngle);
+                break;
+
+            case Sensor.TYPE_LIGHT:
+                sensorView = inflater.inflate(R.layout.item_light_sensor, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.lightValue);
+                break;
+
+            case Sensor.TYPE_LOW_LATENCY_OFFBODY_DETECT:
+            case Sensor.TYPE_MOTION_DETECT:
+            case Sensor.TYPE_SIGNIFICANT_MOTION:
+            case Sensor.TYPE_STATIONARY_DETECT:
+            case Sensor.TYPE_STEP_DETECTOR:
+                sensorView = inflater.inflate(R.layout.item_off_body_detect, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.detect);
+                break;
+
+            case Sensor.TYPE_ORIENTATION:
+                sensorView = inflater.inflate(R.layout.item_orientation, sensorValueContainer, false);
+                valueX = sensorView.findViewById(R.id.azimuth);
+                valueY = sensorView.findViewById(R.id.pitch);
+                valueZ = sensorView.findViewById(R.id.roll);
+                break;
 
             case Sensor.TYPE_POSE_6DOF:
                 sensorView = inflater.inflate(R.layout.item_pose_6dof, sensorValueContainer, false);
@@ -28,6 +117,25 @@ public class SensorUIHelper {
                 biasZ = sensorView.findViewById(R.id.quarZ);
                 break;
 
+            case Sensor.TYPE_PRESSURE:
+                sensorView = inflater.inflate(R.layout.item_pressure, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.pressureValue);
+                break;
+
+            case Sensor.TYPE_PROXIMITY:
+                sensorView = inflater.inflate(R.layout.item_proximity, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.proximityValue);
+                break;
+
+            case Sensor.TYPE_RELATIVE_HUMIDITY:
+                sensorView = inflater.inflate(R.layout.item_humidity, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.humidityValue);
+                break;
+
+            case Sensor.TYPE_STEP_COUNTER:
+                sensorView = inflater.inflate(R.layout.item_step_counter, sensorValueContainer, false);
+                value = sensorView.findViewById(R.id.stepValue);
+                break;
 
             default:
                 break;
