@@ -15,14 +15,14 @@
         android:textColor="@android:color/black"
         android:paddingBottom="2dp"/>
 
-    <!-- Container for Type and Hardware/Software Info -->
+    <!-- Container for Type and Vendor Info -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- Sensor Type (Left-Aligned) -->
+        <!-- Sensor Type -->
         <TextView
             android:id="@+id/sensorType"
             android:layout_width="0dp"
@@ -31,9 +31,9 @@
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"/>
 
-        <!-- Hardware or Software Classification (Right-Aligned) -->
+        <!-- Sensor Vendor -->
         <TextView
-            android:id="@+id/sensorCategory"
+            android:id="@+id/sensorVendor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"

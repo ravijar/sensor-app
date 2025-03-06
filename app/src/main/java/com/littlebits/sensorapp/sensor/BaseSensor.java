@@ -33,6 +33,14 @@ public abstract class BaseSensor implements SensorEventListener {
         sensorManager.unregisterListener(this);
     }
 
+    public String getName() {
+        return sensor.getName();
+    }
+
+    public String getVendor() {
+        return sensor.getVendor();
+    }
+
     public String getStringType() {
         String stringType = sensor.getStringType();
 

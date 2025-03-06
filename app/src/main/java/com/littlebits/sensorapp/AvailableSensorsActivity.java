@@ -58,10 +58,12 @@ public class AvailableSensorsActivity extends AppCompatActivity {
                 // Get UI elements
                 TextView sensorName = convertView.findViewById(R.id.sensorName);
                 TextView sensorType = convertView.findViewById(R.id.sensorType);
+                TextView sensorVendor = convertView.findViewById(R.id.sensorVendor);
 
                 // Set sensor values
-                sensorName.setText(sensor.getStringType());
-                sensorType.setText("Type: " + sensor.getStringType());
+                sensorName.setText(sensor.getName());
+                sensorType.setText(sensor.getStringType());
+                sensorVendor.setText(sensor.getVendor());
 
                 return convertView;
             }

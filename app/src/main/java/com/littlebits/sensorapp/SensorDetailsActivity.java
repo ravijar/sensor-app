@@ -36,7 +36,7 @@ public class SensorDetailsActivity extends AppCompatActivity implements SensorOb
         sensorValueContainer = findViewById(R.id.sensorValueContainer);
 
         // Set sensor name as the title
-        sensorTitle.setText(sensorInstance.getStringType());
+        sensorTitle.setText(sensorInstance.getName());
 
         // Inflate and add the sensor-specific UI dynamically
         sensorInstance.inflateSensorView(this, sensorValueContainer);
