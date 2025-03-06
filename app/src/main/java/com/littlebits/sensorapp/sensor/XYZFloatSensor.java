@@ -1,13 +1,19 @@
 package com.littlebits.sensorapp.sensor;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.sensor.value.XYZFloat;
 
 public abstract class XYZFloatSensor extends BaseSensor implements XYZFloat {
     private float x,y,z = 0;
+    private TextView xTextView, yTextView, zTextView;
 
     public XYZFloatSensor(SensorManager sensorManager, int sensorType) {
         super(sensorManager, sensorType);
@@ -18,6 +24,7 @@ public abstract class XYZFloatSensor extends BaseSensor implements XYZFloat {
         setX(event.values[0]);
         setY(event.values[1]);
         setZ(event.values[2]);
+        if (sensorViewInflated) updateSensorUI();
         notifyObservers();
     }
 
@@ -53,4 +60,25 @@ public abstract class XYZFloatSensor extends BaseSensor implements XYZFloat {
     public void setZ(float z) {
         this.z = z;
     }
+
+    @Override
+    public void inflateSensorView(Context context, LinearLayout sensorValueContainer) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        sensorView = layoutInflater.inflate(R.layout.item_xyz_float_sensor, sensorValueContainer, false);
+        sensorValueContainer.addView(sensorView);
+
+        xTextView = sensorView.findViewById(R.id.x);
+        yTextView = sensorView.findViewById(R.id.y);
+        zTextView = sensorView.findViewById(R.id.z);
+
+        sensorViewInflated = true;
+    }
+
+    @Override
+    protected void updateSensorUI() {
+        xTextView.setText(String.format("X: %s", x));
+        yTextView.setText(String.format("Y: %s", y));
+        zTextView.setText(String.format("Z: %s", z));
+    }
+
 }

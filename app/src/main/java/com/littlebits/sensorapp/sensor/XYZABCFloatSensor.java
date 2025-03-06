@@ -1,13 +1,19 @@
 package com.littlebits.sensorapp.sensor;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.sensor.value.XYZABCFloat;
 
 public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloat {
     private float x,y,z,a,b,c = 0;
+    private TextView xTextView,yTextView,zTextView,aTextView,bTextView,cTextView;
 
     public XYZABCFloatSensor(SensorManager sensorManager, int sensorType) {
         super(sensorManager, sensorType);
@@ -21,6 +27,7 @@ public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloa
         setA(event.values[3]);
         setB(event.values[4]);
         setC(event.values[5]);
+        if (sensorViewInflated) updateSensorUI();
         notifyObservers();
     }
 
@@ -85,5 +92,31 @@ public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloa
     @Override
     public void setC(float c) {
         this.c = c;
+    }
+
+    @Override
+    public void inflateSensorView(Context context, LinearLayout sensorValueContainer) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        sensorView = layoutInflater.inflate(R.layout.item_xyzabc_float_sensor, sensorValueContainer, false);
+        sensorValueContainer.addView(sensorView);
+
+        xTextView = sensorView.findViewById(R.id.x);
+        yTextView = sensorView.findViewById(R.id.y);
+        zTextView = sensorView.findViewById(R.id.z);
+        aTextView = sensorView.findViewById(R.id.a);
+        bTextView = sensorView.findViewById(R.id.b);
+        cTextView = sensorView.findViewById(R.id.c);
+
+        sensorViewInflated = true;
+    }
+
+    @Override
+    protected void updateSensorUI() {
+        xTextView.setText(String.format("X: %s", x));
+        yTextView.setText(String.format("Y: %s", y));
+        zTextView.setText(String.format("Z: %s", z));
+        aTextView.setText(String.format("A: %s", a));
+        bTextView.setText(String.format("B: %s", b));
+        cTextView.setText(String.format("C: %s", c));
     }
 }

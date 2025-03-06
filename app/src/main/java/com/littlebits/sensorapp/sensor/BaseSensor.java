@@ -1,9 +1,12 @@
 package com.littlebits.sensorapp.sensor;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,8 @@ public abstract class BaseSensor implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor sensor;
     private List<SensorObserver> observers = new ArrayList<>();
+    protected View sensorView;
+    protected boolean sensorViewInflated = false;
 
     public BaseSensor(SensorManager sensorManager, int sensorType) {
         this.sensorManager = sensorManager;
@@ -58,4 +63,8 @@ public abstract class BaseSensor implements SensorEventListener {
 
     @Override
     public abstract void onAccuracyChanged(Sensor sensor, int accuracy);
+
+    public abstract void inflateSensorView(Context context, LinearLayout sensorValueContainer);
+
+    protected abstract void updateSensorUI();
 }

@@ -1,38 +1,29 @@
 package com.littlebits.sensorapp;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.littlebits.sensorapp.helper.SensorUIHelper;
+import com.littlebits.sensorapp.sensor.BaseSensor;
+import com.littlebits.sensorapp.repository.SensorRepository;
+import com.littlebits.sensorapp.sensor.SensorObserver;
 
-public class SensorDetailsActivity extends AppCompatActivity implements SensorEventListener {
-    private SensorManager sensorManager;
-    private Sensor sensor;
-    private int sensorType;
+public class SensorDetailsActivity extends AppCompatActivity implements SensorObserver {
+    private BaseSensor sensorInstance;
     private TextView sensorTitle;
     private LinearLayout sensorValueContainer;
-    private SensorUIHelper sensorUIHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_details);
 
-        // Get sensor type from intent
-        sensorType = getIntent().getIntExtra("sensorType", -1);
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(sensorType);
+        // Retrieve sensor instance from SensorRepository
+        sensorInstance = SensorRepository.getInstance().getCurrentSensor();
 
-        if (sensor == null) {
+        if (sensorInstance == null) {
             finish(); // Close activity if sensor is unavailable
             return;
         }
@@ -43,37 +34,33 @@ public class SensorDetailsActivity extends AppCompatActivity implements SensorEv
         }
         sensorTitle = findViewById(R.id.sensorTitle);
         sensorValueContainer = findViewById(R.id.sensorValueContainer);
-        sensorUIHelper = new SensorUIHelper();
-        sensorTitle.setText(sensor.getName());
 
-        // Inflate and add the sensor-specific UI
-        View sensorView = sensorUIHelper.inflateSensorView(this, sensorType, sensorValueContainer);
-        if (sensorView != null) {
-            sensorValueContainer.addView(sensorView);
-        }
+        // Set sensor name as the title
+        sensorTitle.setText(sensorInstance.getStringType());
+
+        // Inflate and add the sensor-specific UI dynamically
+        sensorInstance.inflateSensorView(this, sensorValueContainer);
+        sensorInstance.addObserver(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (sensor != null) {
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+        if (sensorInstance != null) {
+            sensorInstance.register();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(this);
+        if (sensorInstance != null) {
+            sensorInstance.unregister();
+        }
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        sensorUIHelper.updateSensorValues(sensorType, event.values);
-    }
+    public void onSensorChanged() {
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Handle accuracy changes if needed
     }
 }
