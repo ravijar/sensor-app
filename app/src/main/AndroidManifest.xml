@@ -8,6 +8,7 @@
     <uses-feature android:name="android.hardware.sensor.light" android:required="false"/>
 
     <application
+        android:name=".SensorApp"
         android:allowBackup="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         android:usesCleartextTraffic="true"
@@ -15,7 +16,7 @@
         android:label="Sensor App">
 
         <!-- Ensure MainActivity is the Launcher Activity -->
-        <activity android:name=".MainActivity"
+        <activity android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,16 +25,14 @@
         </activity>
 
         <activity
-            android:name=".AvailableSensorsActivity"
+            android:name=".activity.AvailableSensorsActivity"
             android:exported="true"
-            android:parentActivityName=".MainActivity"
-        />
+            android:parentActivityName=".activity.MainActivity"/>
 
         <activity
-            android:name=".SensorDetailsActivity"
+            android:name=".activity.SensorDetailsActivity"
             android:exported="true"
-            android:parentActivityName=".AvailableSensorsActivity"
-        />
+            android:parentActivityName=".activity.AvailableSensorsActivity"/>
 
     </application>
 

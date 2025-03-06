@@ -1,6 +1,5 @@
-package com.littlebits.sensorapp;
+package com.littlebits.sensorapp.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.sensor.BaseSensor;
 import com.littlebits.sensorapp.repository.SensorRepository;
 
@@ -36,10 +36,6 @@ public class AvailableSensorsActivity extends AppCompatActivity {
         }
 
         sensorListView = findViewById(R.id.sensorList);
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        // Initialize sensors in the repository (only happens once)
-        SensorRepository.getInstance().initializeSensors(sensorManager);
 
         // Get the sensor instances from the repository
         Map<Integer, BaseSensor> sensorMap = SensorRepository.getInstance().getAllSensors();
