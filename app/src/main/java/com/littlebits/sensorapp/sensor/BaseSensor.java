@@ -66,5 +66,5 @@ public abstract class BaseSensor implements SensorEventListener {
 
     public abstract void inflateSensorView(Context context, LinearLayout sensorValueContainer);
 
-    protected abstract void updateSensorUI();
+    public abstract void updateSensorUI();
 }

@@ -23,7 +23,6 @@ public abstract class XYFloatSensor extends BaseSensor implements XYFloat {
     public void onSensorChanged(SensorEvent event) {
         setX(event.values[0]);
         setY(event.values[1]);
-        if (sensorViewInflated) updateSensorUI();
         notifyObservers();
     }
 
@@ -63,8 +62,10 @@ public abstract class XYFloatSensor extends BaseSensor implements XYFloat {
     }
 
     @Override
-    protected void updateSensorUI() {
-        xTextView.setText(String.format("X: %s", x));
-        yTextView.setText(String.format("Y: %s", y));
+    public void updateSensorUI() {
+        if (sensorViewInflated) {
+            xTextView.setText(String.format("X: %s", x));
+            yTextView.setText(String.format("Y: %s", y));
+        }
     }
 }

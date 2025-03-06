@@ -22,7 +22,6 @@ public abstract class XFloatSensor extends BaseSensor implements XFloat {
     @Override
     public void onSensorChanged(SensorEvent event) {
         setX(event.values[0]);
-        if (sensorViewInflated) updateSensorUI();
         notifyObservers();
     }
 
@@ -51,7 +50,9 @@ public abstract class XFloatSensor extends BaseSensor implements XFloat {
     }
 
     @Override
-    protected void updateSensorUI() {
-        xTextView.setText(String.format("X: %s", x));
+    public void updateSensorUI() {
+        if (sensorViewInflated) {
+            xTextView.setText(String.format("X: %s", x));
+        }
     }
 }

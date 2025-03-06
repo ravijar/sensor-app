@@ -27,7 +27,6 @@ public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloa
         setA(event.values[3]);
         setB(event.values[4]);
         setC(event.values[5]);
-        if (sensorViewInflated) updateSensorUI();
         notifyObservers();
     }
 
@@ -111,12 +110,14 @@ public abstract class XYZABCFloatSensor extends BaseSensor implements XYZABCFloa
     }
 
     @Override
-    protected void updateSensorUI() {
-        xTextView.setText(String.format("X: %s", x));
-        yTextView.setText(String.format("Y: %s", y));
-        zTextView.setText(String.format("Z: %s", z));
-        aTextView.setText(String.format("A: %s", a));
-        bTextView.setText(String.format("B: %s", b));
-        cTextView.setText(String.format("C: %s", c));
+    public void updateSensorUI() {
+        if (sensorViewInflated) {
+            xTextView.setText(String.format("X: %s", x));
+            yTextView.setText(String.format("Y: %s", y));
+            zTextView.setText(String.format("Z: %s", z));
+            aTextView.setText(String.format("A: %s", a));
+            bTextView.setText(String.format("B: %s", b));
+            cTextView.setText(String.format("C: %s", c));
+        }
     }
 }
