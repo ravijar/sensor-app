@@ -1,7 +1,6 @@
 package com.littlebits.sensorapp.activity;
 
 import android.content.Intent;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AvailableSensorsActivity extends AppCompatActivity {
-    private SensorManager sensorManager;
     private ListView sensorListView;
     private List<BaseSensor> sensorList;
 
