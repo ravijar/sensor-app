@@ -23,7 +23,7 @@ public abstract class XYFloatSensor extends BaseSensor implements XYFloat {
     public void onSensorChanged(SensorEvent event) {
         setX(event.values[0]);
         setY(event.values[1]);
-        notifyObservers();
+        notifyObservers(event.sensor.getType());
     }
 
     @Override

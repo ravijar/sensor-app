@@ -61,7 +61,7 @@ public class SensorDetailsActivity extends AppCompatActivity implements SensorOb
     }
 
     @Override
-    public void onSensorChanged() {
+    public void onSensorChanged(int sensorType) {
         sensorInstance.updateSensorUI();
     }
 }

@@ -60,9 +60,9 @@ public abstract class BaseSensor implements SensorEventListener {
         observers.remove(observer);
     }
 
-    protected void notifyObservers() {
+    protected void notifyObservers(int sensorType) {
         for (SensorObserver observer : observers) {
-            observer.onSensorChanged();
+            observer.onSensorChanged(sensorType);
         }
     }
 

@@ -24,7 +24,7 @@ public abstract class XYZFloatSensor extends BaseSensor implements XYZFloat {
         setX(event.values[0]);
         setY(event.values[1]);
         setZ(event.values[2]);
-        notifyObservers();
+        notifyObservers(event.sensor.getType());
     }
 
     @Override

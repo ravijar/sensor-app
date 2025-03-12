@@ -12,79 +12,100 @@ import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.repository.SensorRepository;
 import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
-import com.littlebits.sensorapp.service.ActivityRecognizer;
+import com.littlebits.sensorapp.service.ActivityClassifier;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
-import ai.onnxruntime.OrtException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SensorObserver {
-    private ActivityRecognizer activityRecognizer;
-    private TextView activityText;
-    private XYZFloatSensor accelerometer, gyroscope;
-    private float[] sensorData = new float[6]; // Holds latest sensor values
+    private final int TIME_STAMP = 100;
+
+    private ActivityClassifier classifier;
+    private XYZFloatSensor accelerometer, gyroscope, linearAcceleration;
+    private List<Float> ax,ay,az;
+    private List<Float> gx,gy,gz;
+    private List<Float> lx,ly,lz;
+    private float[] results;
+
+    private TextView bikingTextView, downstairsTextView, joggingTextView, sittingTextView, standingTextView, upstairsTextView, walkingTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        activityText = findViewById(R.id.activityText);
+        bikingTextView = findViewById(R.id.biking_TextView);
+        downstairsTextView = findViewById(R.id.downstairs_TextView);
+        joggingTextView = findViewById(R.id.jogging_TextView);
+        sittingTextView  = findViewById(R.id.sitting_TextView);
+        standingTextView = findViewById(R.id.standing_TextView);
+        upstairsTextView = findViewById(R.id.upstairs_TextView);
+        walkingTextView = findViewById(R.id.walking_TextView);
 
-        // Get accelerometer & gyroscope sensors
+        ax=new ArrayList<>(); ay=new ArrayList<>(); az=new ArrayList<>();
+        gx=new ArrayList<>(); gy=new ArrayList<>(); gz=new ArrayList<>();
+        lx=new ArrayList<>(); ly=new ArrayList<>(); lz=new ArrayList<>();
+
+        classifier=new ActivityClassifier(getApplicationContext());
+
         accelerometer = (XYZFloatSensor) SensorRepository.getInstance().getSensor(Sensor.TYPE_ACCELEROMETER);
         gyroscope = (XYZFloatSensor) SensorRepository.getInstance().getSensor(Sensor.TYPE_GYROSCOPE);
+        linearAcceleration = (XYZFloatSensor) SensorRepository.getInstance().getSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
-        // Register observers
         accelerometer.addObserver(this);
         gyroscope.addObserver(this);
+        linearAcceleration.addObserver(this);
+    }
 
-        try {
-            // Load ONNX model
-            File modelFile = new File(getFilesDir(), "activity_recognition_new.onnx");
-            if (!modelFile.exists()) {
-                copyAsset("activity_recognition_new.onnx", modelFile);
-            }
-            activityRecognizer = new ActivityRecognizer(modelFile.getAbsolutePath());
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void predictActivity() {
+        List<Float> data=new ArrayList<>();
+        if (ax.size() >= TIME_STAMP && ay.size() >= TIME_STAMP && az.size() >= TIME_STAMP
+                && gx.size() >= TIME_STAMP && gy.size() >= TIME_STAMP && gz.size() >= TIME_STAMP
+                && lx.size() >= TIME_STAMP && ly.size() >= TIME_STAMP && lz.size() >= TIME_STAMP) {
+            data.addAll(ax.subList(0,TIME_STAMP));
+            data.addAll(ay.subList(0,TIME_STAMP));
+            data.addAll(az.subList(0,TIME_STAMP));
+
+            data.addAll(gx.subList(0,TIME_STAMP));
+            data.addAll(gy.subList(0,TIME_STAMP));
+            data.addAll(gz.subList(0,TIME_STAMP));
+
+            data.addAll(lx.subList(0,TIME_STAMP));
+            data.addAll(ly.subList(0,TIME_STAMP));
+            data.addAll(lz.subList(0,TIME_STAMP));
+
+            results = classifier.predictProbabilities(toFloatArray(data));
+
+            bikingTextView.setText("Biking: \t" + round(results[0],2));
+            downstairsTextView.setText("DownStairs: \t" + round(results[1],2));
+            joggingTextView.setText("Jogging: \t" + round(results[2],2));
+            sittingTextView.setText("Sitting: \t" + round(results[3],2));
+            standingTextView.setText("Standing: \t" + round(results[4],2));
+            upstairsTextView.setText("Upstairs: \t" + round(results[5],2));;
+            walkingTextView.setText("Walking: \t" + round(results[6],2));
+
+
+            data.clear();
+            ax.clear(); ay.clear(); az.clear();
+            gx.clear(); gy.clear(); gz.clear();
+            lx.clear();ly.clear(); lz.clear();
         }
     }
 
-    public void predictActivity(float[] sensorData) {
-        try {
-            int activityIndex = activityRecognizer.predictActivity(sensorData);
-
-            // Activity labels (in the same order as training)
-            String[] activities = {
-                    "Standing Still", "Sitting Still", "Talking while Sitting", "Talking while Standing/Walking",
-                    "Standing Up and Sitting Down", "Laying Still", "Standing Up and Laying Down",
-                    "Picking up an Object", "Jumping", "Push-ups", "Sit-ups", "Walking",
-                    "Walking Backward", "Walking in a Circle", "Running",
-                    "Ascending Stairs", "Descending Stairs", "Playing Table Tennis"
-            };
-
-            // Update UI only if a valid prediction is made
-            if (activityIndex >= 0 && activityIndex < activities.length) {
-                activityText.setText(String.format("Predicted Activity: %s", activities[activityIndex]));
-            }
-        } catch (OrtException e) {
-            e.printStackTrace();
-        }
+    private float round(float value, int decimal_places) {
+        BigDecimal bigDecimal=new BigDecimal(Float.toString(value));
+        bigDecimal = bigDecimal.setScale(decimal_places, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.floatValue();
     }
 
-    private void copyAsset(String assetName, File outFile) throws Exception {
-        InputStream in = getAssets().open(assetName);
-        FileOutputStream out = new FileOutputStream(outFile);
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
+    private float[] toFloatArray(List<Float> data) {
+        int i=0;
+        float[] array=new float[data.size()];
+        for (Float f:data) {
+            array[i++] = (f != null ? f: Float.NaN);
         }
-        in.close();
-        out.close();
+        return array;
     }
 
     @Override
@@ -107,16 +128,22 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
     }
 
     @Override
-    public void onSensorChanged() {
-        // Read sensor values
-        sensorData[0] = accelerometer.getX();
-        sensorData[1] = accelerometer.getY();
-        sensorData[2] = accelerometer.getZ();
-        sensorData[3] = gyroscope.getX();
-        sensorData[4] = gyroscope.getY();
-        sensorData[5] = gyroscope.getZ();
+    public void onSensorChanged(int sensorType) {
+        switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+                ax.add(accelerometer.getX());
+                ay.add(accelerometer.getY());
+                az.add(accelerometer.getZ());
+            case Sensor.TYPE_GYROSCOPE:
+                gx.add(gyroscope.getX());
+                gy.add(gyroscope.getY());
+                gz.add(gyroscope.getZ());
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                lx.add(linearAcceleration.getX());
+                ly.add(linearAcceleration.getY());
+                lz.add(linearAcceleration.getZ());
+        }
 
-        // Make prediction
-        predictActivity(sensorData);
+        predictActivity();
     }
 }

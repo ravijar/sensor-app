@@ -22,7 +22,7 @@ public abstract class XFloatSensor extends BaseSensor implements XFloat {
     @Override
     public void onSensorChanged(SensorEvent event) {
         setX(event.values[0]);
-        notifyObservers();
+        notifyObservers(event.sensor.getType());
     }
 
     @Override
