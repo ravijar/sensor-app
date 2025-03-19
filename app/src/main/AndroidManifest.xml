@@ -30,6 +30,11 @@
             android:parentActivityName=".activity.MainActivity"/>
 
         <activity
+            android:name=".activity.WorkoutActivity"
+            android:exported="true"
+            android:parentActivityName=".activity.HomeActivity"/>
+
+        <activity
             android:name=".activity.AvailableSensorsActivity"
             android:exported="true"
             android:parentActivityName=".activity.MainActivity"/>

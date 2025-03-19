@@ -8,8 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="W1">#DC2528</color>
     <color name="S3">#F2613F</color>
     <color name="P2">#4C88F5</color>
+    <color name="P3">#0056F1</color>
     <color name="G100">#FFFFFF</color>
     <color name="G150">#F2F2F2</color>
     <color name="G900">#050A12</color>

@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <!-- Workout Timer -->
+    <LinearLayout
+        android:id="@+id/workoutHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:background="@drawable/round_button"
+            android:backgroundTint="@color/G150"
+            android:src="@drawable/ic_distance_l"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:paddingVertical="5dp"
+            android:paddingHorizontal="25dp"
+            android:text="00 : 00 : 00"
+            android:textSize="32sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/P2"
+            android:layout_centerHorizontal="true"/>
+
+    </LinearLayout>
+
+    <!-- Grid Layout for Workout Data -->
+    <GridLayout
+        android:id="@+id/workoutGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/workoutHeader"
+        android:layout_marginTop="20dp"
+        android:columnCount="2"
+        android:rowCount="3"
+        android:layout_centerHorizontal="true"
+        >
+
+        <!-- Steps -->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="10dp"
+            android:padding="12dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/G150"
+            android:orientation="vertical">
+
+            <!-- Top row with title and circular icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"/>
+
+                <!-- Circular background for icon -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/G100"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_steps_m"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Step count positioned at the bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="250"
+                    android:textSize="26sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!-- Distance -->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="10dp"
+            android:padding="12dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/G900"
+            android:orientation="vertical">
+
+            <!-- Top row with title and circular icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Distance"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:layout_weight="1"/>
+
+                <!-- Circular background for icon -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/G100"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_distance_m"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Distance value positioned at the bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="200"
+                    android:textSize="26sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meters"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Speed -->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="10dp"
+            android:padding="12dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/P3"
+            android:orientation="vertical">
+
+            <!-- Top row with title and circular icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Speed"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:layout_weight="1"/>
+
+                <!-- Circular background for icon -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/G100"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_speed_m"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Speed value positioned at the bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20"
+                    android:textSize="26sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kmph"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Altitude -->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="10dp"
+            android:padding="12dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/G150"
+            android:orientation="vertical">
+
+            <!-- Top row with title and circular icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"/>
+
+                <!-- Circular background for icon -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/G100"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_altitude_m"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Altitude value positioned at the bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20"
+                    android:textSize="26sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meters"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Calories -->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="10dp"
+            android:padding="12dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/P2"
+            android:orientation="vertical">
+
+            <!-- Top row with title and circular icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calories"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:layout_weight="1"/>
+
+                <!-- Circular background for icon -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/G100"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_calories_m"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Calories value positioned at the bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="18"
+                    android:textSize="26sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="g"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!-- Bottom Buttons -->
+        <GridLayout
+            android:id="@+id/bottomButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_below="@id/workoutGrid"
+            android:layout_centerHorizontal="true"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <!-- Heart Rate -->
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/card_background"
+                android:backgroundTint="@color/P2"
+                android:src="@drawable/ic_heart_rate"
+                android:scaleType="centerInside" />
+
+            <!-- Location -->
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/card_background"
+                android:backgroundTint="@color/G900"
+                android:src="@drawable/ic_location_l"
+                android:scaleType="centerInside" />
+
+            <!-- SOS Button -->
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/card_background"
+                android:backgroundTint="@color/W1"
+                android:src="@drawable/ic_sos"
+                android:scaleType="centerInside" />
+
+            <!-- Pause -->
+            <ImageView
+                android:id="@+id/pauseButton"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/card_background"
+                android:backgroundTint="@color/G150"
+                android:src="@drawable/ic_pause"
+                android:scaleType="centerInside" />
+        </GridLayout>
+    </GridLayout>
+
+    <!-- End Workout Button -->
+    <Button
+        android:id="@+id/endWorkoutButton"
+        android:layout_width="340dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="20dp"
+        android:text="End Workout"
+        android:textAllCaps="false"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/card_background"
+        android:backgroundTint="@color/W1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
