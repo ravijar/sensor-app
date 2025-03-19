@@ -68,4 +68,12 @@
         android:padding="10dp"
         android:onClick="openAvailableSensors"/>
 
+    <Button
+        android:id="@+id/btnOpenHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="App"
+        android:padding="10dp"
+        android:onClick="openHome"/>
+
 </LinearLayout>

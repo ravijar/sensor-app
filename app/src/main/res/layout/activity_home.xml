@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/G100"
+    android:padding="20dp">
+
+    <!-- App Name -->
+    <TextView
+        android:id="@+id/appTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FitSen."
+        android:textSize="32sp"
+        android:textColor="@color/G900"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:layout_alignParentTop="true"/>
+
+    <!-- Weather Card -->
+    <LinearLayout
+        android:id="@+id/weatherCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_background"
+        android:padding="12dp"
+        android:orientation="vertical"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:layout_below="@id/appTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp">
+
+        <!-- Row 1: Weather Icon & Temperature -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/weatherIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_sun" />
+
+            <TextView
+                android:id="@+id/weatherTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="32°"
+                android:textSize="30sp"
+                android:textColor="@color/G900"
+                android:layout_marginStart="5dp" />
+        </LinearLayout>
+
+        <!-- Row 2: Location Icon & Location Text -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:id="@+id/locationIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_location" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Katubedda Junction"
+                android:textSize="12sp"
+                android:textColor="@color/G900"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Start Workout Button -->
+    <Button
+        android:id="@+id/startWorkoutButton"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:background="@drawable/round_button"
+        android:textAllCaps="false"
+        android:text="Start\nWorkout"
+        android:textColor="@color/G900"
+        android:textSize="32sp"
+        android:gravity="center"
+        android:layout_above="@id/bottomNav"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"/>
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginBottom="30dp"
+        android:layout_alignParentBottom="true">
+
+        <!-- Heart Rate Button -->
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/nav_button_rounded"
+            android:onClick="onHeartRateClick"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_heart" />
+
+        <!-- Logs Button -->
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/nav_button_rounded"
+            android:onClick="onLogsClick"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_logs" />
+
+        <!-- Profile Button -->
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/nav_button_rounded"
+            android:onClick="onProfileClick"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_profile" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -127,6 +127,11 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
         startActivity(intent);
     }
 
+    public void openHome(View view) {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onSensorChanged(int sensorType) {
         switch (sensorType) {

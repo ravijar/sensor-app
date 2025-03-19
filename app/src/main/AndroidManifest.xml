@@ -25,6 +25,11 @@
         </activity>
 
         <activity
+            android:name=".activity.HomeActivity"
+            android:exported="true"
+            android:parentActivityName=".activity.MainActivity"/>
+
+        <activity
             android:name=".activity.AvailableSensorsActivity"
             android:exported="true"
             android:parentActivityName=".activity.MainActivity"/>
