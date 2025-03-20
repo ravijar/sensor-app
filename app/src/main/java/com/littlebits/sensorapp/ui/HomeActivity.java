@@ -2,16 +2,12 @@ package com.littlebits.sensorapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
 
 public class HomeActivity extends AppCompatActivity {
-
-    private Button startWorkoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,16 +19,11 @@ public class HomeActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        // Find the Start Workout button
-        startWorkoutButton = findViewById(R.id.startWorkoutButton);
-
         // Set click listener to navigate to WorkoutActivity
-        startWorkoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, WorkoutActivity.class);
-                startActivity(intent);
-            }
-        });
+        findViewById(R.id.startWorkoutButton).setOnClickListener(v -> startWorkout());
+    }
+
+    private void startWorkout() {
+        startActivity(new Intent(this, WorkoutActivity.class));
     }
 }
