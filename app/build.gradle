@@ -14,6 +14,17 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load local.properties to retrieve WEATHER_API_KEY
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file("local.properties")
+
+        if (localPropertiesFile.exists()) {
+            localProperties.load(new FileInputStream(localPropertiesFile))
+        }
+
+        // Set API key from local.properties (fallback to empty string)
+        manifestPlaceholders["WEATHER_API_KEY"] = localProperties.getProperty("WEATHER_API_KEY", "")
     }
 
     buildTypes {
@@ -29,11 +40,12 @@ android {
 }
 
 dependencies {
-
     implementation libs.appcompat
     implementation libs.material
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.tensorflow.android
+    implementation libs.volley
+    implementation libs.play.services.location
 }

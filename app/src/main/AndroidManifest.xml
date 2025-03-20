@@ -1,7 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.littlebits.sensorapp">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true"/>
     <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true"/>
@@ -14,6 +18,10 @@
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:label="Sensor App">
+
+        <meta-data
+            android:name="com.littlebits.sensorapp.WEATHER_API_KEY"
+            android:value="${WEATHER_API_KEY}" />
 
         <!-- Ensure MainActivity is the Launcher Activity -->
         <activity android:name=".ui.MainActivity"
