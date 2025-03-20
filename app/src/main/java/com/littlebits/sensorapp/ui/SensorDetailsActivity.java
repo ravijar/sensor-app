@@ -1,4 +1,4 @@
-package com.littlebits.sensorapp.activity;
+package com.littlebits.sensorapp.ui;
 
 import android.os.Bundle;
 import android.widget.LinearLayout;

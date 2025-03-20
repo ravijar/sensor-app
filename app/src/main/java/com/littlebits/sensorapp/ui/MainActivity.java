@@ -1,4 +1,4 @@
-package com.littlebits.sensorapp.activity;
+package com.littlebits.sensorapp.ui;
 
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -12,7 +12,7 @@ import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.repository.SensorRepository;
 import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
-import com.littlebits.sensorapp.service.ActivityClassifier;
+import com.littlebits.sensorapp.util.ActivityClassifier;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

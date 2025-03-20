@@ -16,7 +16,7 @@
         android:label="Sensor App">
 
         <!-- Ensure MainActivity is the Launcher Activity -->
-        <activity android:name=".activity.MainActivity"
+        <activity android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,24 +25,24 @@
         </activity>
 
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".ui.HomeActivity"
             android:exported="true"
-            android:parentActivityName=".activity.MainActivity"/>
+            android:parentActivityName=".ui.MainActivity"/>
 
         <activity
-            android:name=".activity.WorkoutActivity"
+            android:name=".ui.WorkoutActivity"
             android:exported="true"
-            android:parentActivityName=".activity.HomeActivity"/>
+            android:parentActivityName=".ui.HomeActivity"/>
 
         <activity
-            android:name=".activity.AvailableSensorsActivity"
+            android:name=".ui.AvailableSensorsActivity"
             android:exported="true"
-            android:parentActivityName=".activity.MainActivity"/>
+            android:parentActivityName=".ui.MainActivity"/>
 
         <activity
-            android:name=".activity.SensorDetailsActivity"
+            android:name=".ui.SensorDetailsActivity"
             android:exported="true"
-            android:parentActivityName=".activity.AvailableSensorsActivity"/>
+            android:parentActivityName=".ui.AvailableSensorsActivity"/>
 
     </application>
 

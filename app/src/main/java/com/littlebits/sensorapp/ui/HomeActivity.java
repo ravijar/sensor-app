@@ -1,4 +1,4 @@
-package com.littlebits.sensorapp.activity;
+package com.littlebits.sensorapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
