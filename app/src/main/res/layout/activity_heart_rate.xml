@@ -8,11 +8,12 @@
 
     <!-- Back Button -->
     <ImageButton
+        android:id="@+id/backButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="46dp"
         android:layout_marginTop="70dp"
         android:background="@drawable/back_button_bg"
         android:padding="15dp"
