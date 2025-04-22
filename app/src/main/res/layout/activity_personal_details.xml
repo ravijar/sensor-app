@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/G100"
+    android:padding="16dp">
+
+    <!-- Back Button -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/back_button_bg"
+        android:padding="15dp"
+        android:src="@drawable/ic_back"
+        android:onClick="onBackClicked" />
+
+    <TextView
+        android:id="@+id/personalDetailsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backButton"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="30dp"
+        android:text="Personal Details"
+        android:textSize="32sp"
+        android:textColor="@android:color/black" />
+
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@id/personalDetailsTitle"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="30dp"
+        android:src="@drawable/ic_profile"
+        app:tint="@color/S3" />
+
+
+    <!-- Parent Vertical LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profileImage"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="20dp"
+        android:orientation="vertical">
+
+        <!-- Child: Name Field -->
+        <LinearLayout
+            android:id="@+id/nameField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/personal_details_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!-- Editable Text -->
+            <EditText
+                android:id="@+id/editName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:enabled="false"
+                android:hint="Your name"
+                android:inputType="textPersonName"
+                android:text="Isuru Deshan"
+                android:textColor="@android:color/black"
+                android:paddingLeft="12dp"
+                android:textSize="18sp" />
+
+            <!-- Edit Icon -->
+            <ImageButton
+                android:id="@+id/editNameButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/P2"
+                android:contentDescription="Edit"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_edit_pen" />
+        </LinearLayout>
+
+        <!-- Child: Age Field -->
+        <LinearLayout
+            android:id="@+id/ageField"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/personal_details_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!-- Editable Text -->
+            <EditText
+                android:id="@+id/editAge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:enabled="false"
+                android:hint="Age"
+                android:inputType="number"
+                android:paddingLeft="12dp"
+                android:text="25"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="years"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="6dp" />
+
+            <!-- Edit Icon -->
+            <ImageButton
+                android:id="@+id/editAgeButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/P2"
+                android:contentDescription="Edit"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_edit_pen" />
+        </LinearLayout>
+
+        <!-- Child: Gender Field -->
+        <LinearLayout
+            android:id="@+id/genderField"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/personal_details_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!-- Editable Text -->
+            <EditText
+                android:id="@+id/editGender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:enabled="false"
+                android:hint="Gender"
+                android:inputType="text"
+                android:paddingLeft="12dp"
+                android:text="Male"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <!-- Edit Icon -->
+            <ImageButton
+                android:id="@+id/editGenderButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/P2"
+                android:contentDescription="Edit"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_edit_pen" />
+        </LinearLayout>
+
+        <!-- Child: Height and Weight Fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <!-- Height Field -->
+            <LinearLayout
+                android:id="@+id/heightField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/personal_details_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <EditText
+                    android:id="@+id/editHeight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:enabled="false"
+                    android:hint="Height"
+                    android:inputType="number"
+                    android:text="160"
+                    android:textColor="@android:color/black"
+                    android:paddingLeft="12dp"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="cm"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="6dp" />
+
+                <ImageButton
+                    android:id="@+id/editHeightButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/P2"
+                    android:contentDescription="Edit"
+                    android:padding="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_edit_pen" />
+            </LinearLayout>
+
+            <!-- Weight Field -->
+            <LinearLayout
+                android:id="@+id/weightField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/personal_details_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <EditText
+                    android:id="@+id/editWeight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:enabled="false"
+                    android:hint="Weight"
+                    android:inputType="number"
+                    android:text="80"
+                    android:textColor="@android:color/black"
+                    android:paddingLeft="12dp"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kg"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="6dp" />
+
+                <ImageButton
+                    android:id="@+id/editWeightButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/P2"
+                    android:contentDescription="Edit"
+                    android:padding="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_edit_pen" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bmiField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/personal_details_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!-- BMI Label -->
+            <TextView
+                android:id="@+id/bmiLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="BMI Result"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:paddingLeft="12dp" />
+
+            <!-- BMI Status Indicator (color circle) -->
+            <View
+                android:id="@+id/bmiStatusIndicator"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/round_button" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sosContactField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/personal_details_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!-- SOS Icon (Left) -->
+            <ImageView
+                android:id="@+id/sosIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/W1"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_sos" />
+
+            <!-- SOS Contact Number -->
+            <EditText
+                android:id="@+id/sosContact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:enabled="false"
+                android:hint="SOS Contact"
+                android:inputType="phone"
+                android:text="+94 71 444 0625"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:paddingLeft="6dp" />
+
+            <!-- Edit Icon (Right) -->
+            <ImageButton
+                android:id="@+id/editSosButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/P2"
+                android:contentDescription="Edit SOS"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_edit_pen" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>
