@@ -94,7 +94,8 @@
         android:gravity="center"
         android:layout_above="@id/bottomNav"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"/>
+        android:layout_marginBottom="80dp"
+        android:onClick="onWorkoutClick" />
 
     <!-- Bottom Navigation Bar -->
     <LinearLayout

@@ -43,6 +43,16 @@
             android:parentActivityName=".ui.HomeActivity"/>
 
         <activity
+            android:name=".ui.HeartRateActivity"
+            android:exported="true"
+            android:parentActivityName=".ui.HomeActivity"/>
+
+        <activity
+            android:name=".ui.PersonalDetailsActivity"
+            android:exported="true"
+            android:parentActivityName=".ui.HomeActivity"/>
+
+        <activity
             android:name=".ui.AvailableSensorsActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"/>

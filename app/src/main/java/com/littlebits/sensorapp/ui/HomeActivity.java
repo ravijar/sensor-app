@@ -2,6 +2,7 @@ package com.littlebits.sensorapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,13 +34,22 @@ public class HomeActivity extends AppCompatActivity implements WeatherFetcher.We
         // Initialize WeatherFetcher and fetch weather data
         weatherFetcher = new WeatherFetcher(this, this);
         weatherFetcher.fetchWeather();
-
-        // Set click listener to navigate to WorkoutActivity
-        findViewById(R.id.startWorkoutButton).setOnClickListener(v -> startWorkout());
     }
 
-    private void startWorkout() {
+    public void onWorkoutClick(View view) {
         startActivity(new Intent(this, WorkoutActivity.class));
+    }
+
+    public void onHeartRateClick(View view) {
+        startActivity(new Intent(this, HeartRateActivity.class));
+    }
+
+    public void onLogsClick(View view) {
+        startActivity(new Intent(this, HeartRateActivity.class));
+    }
+
+    public void onProfileClick(View view) {
+        startActivity(new Intent(this, PersonalDetailsActivity.class));
     }
 
     @Override
