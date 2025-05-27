@@ -351,5 +351,18 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:text="Save"
+        android:visibility="gone"
+        android:textAllCaps="false"
+        android:textColor="@color/G150"
+        android:background="@drawable/back_button_bg"
+        android:textSize="24sp" />
 
 </RelativeLayout>
