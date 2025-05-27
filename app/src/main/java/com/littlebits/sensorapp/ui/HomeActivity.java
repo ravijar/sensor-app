@@ -45,7 +45,7 @@ public class HomeActivity extends AppCompatActivity implements WeatherFetcher.We
     }
 
     public void onLogsClick(View view) {
-        startActivity(new Intent(this, HeartRateActivity.class));
+        startActivity(new Intent(this, PastWorkoutsActivity.class));
     }
 
     public void onProfileClick(View view) {

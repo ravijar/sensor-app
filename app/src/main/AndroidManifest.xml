@@ -53,6 +53,16 @@
             android:parentActivityName=".ui.HomeActivity"/>
 
         <activity
+            android:name=".ui.PastWorkoutsActivity"
+            android:exported="true"
+            android:parentActivityName=".ui.HomeActivity"/>
+
+        <activity
+            android:name=".ui.WorkoutSummaryActivity"
+            android:exported="true"
+            android:parentActivityName=".ui.PastWorkoutsActivity"/>
+
+        <activity
             android:name=".ui.AvailableSensorsActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"/>
