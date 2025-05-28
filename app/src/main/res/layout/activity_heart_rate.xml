@@ -38,7 +38,7 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@id/heartRateMonitorDoneButton"
         android:layout_marginBottom="50dp"
-        android:text="86 BPM"
+        android:text="Measuring..."
         android:textSize="38sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"/>
@@ -57,5 +57,12 @@
         android:textColor="@color/G150"
         android:textSize="24sp"
         android:onClick="onDoneClicked" />
+
+    <!-- Hidden SurfaceView for camera-based heart rate measurement -->
+    <SurfaceView
+        android:id="@+id/heartRateCameraSurface"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone" />
 
 </RelativeLayout>
