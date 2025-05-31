@@ -147,30 +147,11 @@
             android:padding="5dp">
 
             <!-- Editable Text -->
-            <EditText
-                android:id="@+id/editGender"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:enabled="false"
-                android:hint="Gender"
-                android:inputType="text"
-                android:paddingLeft="12dp"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+            <Spinner
+                android:id="@+id/editGenderSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-            <!-- Edit Icon -->
-            <ImageButton
-                android:id="@+id/editGenderButton"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/round_button"
-                android:backgroundTint="@color/P2"
-                android:contentDescription="Edit"
-                android:padding="6dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_edit_pen" />
         </LinearLayout>
 
         <!-- Child: Height and Weight Fields -->
@@ -363,6 +344,7 @@
         android:textAllCaps="false"
         android:textColor="@color/G150"
         android:background="@drawable/back_button_bg"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:onClick="onSaveClicked"/>
 
 </RelativeLayout>

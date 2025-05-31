@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
@@ -17,15 +19,13 @@ import com.littlebits.sensorapp.util.PersonalDetailsManager;
 
 public class PersonalDetailsActivity extends AppCompatActivity {
 
-    // UI components
-    private EditText editName, editAge, editGender, editHeight, editWeight, editSosContact;
+    private EditText editName, editAge, editHeight, editWeight, editSosContact;
+    private Spinner genderSpinner;
     private TextView bmiStatusText;
-    private ImageButton editNameButton, editAgeButton, editGenderButton, editHeightButton, editWeightButton, editSosButton;
-    private Button saveButton;  // Save button at the bottom
+    private ImageButton editNameButton, editAgeButton, editHeightButton, editWeightButton, editSosButton;
+    private Button saveButton;
 
     private PersonalDetailsManager detailsManager;
-
-    // Variable to track changes
     private boolean isUpdated = false;
 
     @Override
@@ -37,69 +37,57 @@ public class PersonalDetailsActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        // Initialize fields
         editName = findViewById(R.id.editName);
         editAge = findViewById(R.id.editAge);
-        editGender = findViewById(R.id.editGender);
+        genderSpinner = findViewById(R.id.editGenderSpinner);
         editHeight = findViewById(R.id.editHeight);
         editWeight = findViewById(R.id.editWeight);
         editSosContact = findViewById(R.id.sosContact);
         bmiStatusText = findViewById(R.id.bmiLabel);
 
-        // Initialize edit buttons
         editNameButton = findViewById(R.id.editNameButton);
         editAgeButton = findViewById(R.id.editAgeButton);
-        editGenderButton = findViewById(R.id.editGenderButton);
         editHeightButton = findViewById(R.id.editHeightButton);
         editWeightButton = findViewById(R.id.editWeightButton);
         editSosButton = findViewById(R.id.editSosButton);
-
-        // Initialize Save button
         saveButton = findViewById(R.id.saveButton);
 
-        // Initialize PersonalDetailsManager
         detailsManager = new PersonalDetailsManager(this);
 
-        // Set listeners for buttons to allow editing
-        setEditButtonListeners();
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.gender_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genderSpinner.setAdapter(adapter);
 
-        // Load saved data into fields
         loadPersonalDetails();
-
-        // Set listener for save button
-        saveButton.setOnClickListener(v -> {
-            saveAndUpdatePersonalDetails();
-            isUpdated = false;  // Reset updated flag
-            saveButton.setVisibility(View.GONE);  // Hide the save button after saving
-        });
+        setEditButtonListeners();
     }
 
     private void setEditButtonListeners() {
         editNameButton.setOnClickListener(v -> {
             enableEditing(editName);
-            isUpdated = true;  // Mark as updated
-            showSaveButton();  // Show the save button when a field is edited
+            isUpdated = true;
+            showSaveButton();
         });
+
         editAgeButton.setOnClickListener(v -> {
             enableEditing(editAge);
             isUpdated = true;
             showSaveButton();
         });
-        editGenderButton.setOnClickListener(v -> {
-            enableEditing(editGender);
-            isUpdated = true;
-            showSaveButton();
-        });
+
         editHeightButton.setOnClickListener(v -> {
             enableEditing(editHeight);
             isUpdated = true;
             showSaveButton();
         });
+
         editWeightButton.setOnClickListener(v -> {
             enableEditing(editWeight);
             isUpdated = true;
             showSaveButton();
         });
+
         editSosButton.setOnClickListener(v -> {
             enableEditing(editSosContact);
             isUpdated = true;
@@ -107,25 +95,27 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         });
     }
 
-    // Method to enable editing for the fields and move the cursor to the end of the text
     private void enableEditing(EditText editText) {
-        editText.setEnabled(true);  // Enable the EditText field for editing
-        editText.requestFocus();    // Set the focus on the EditText
-        editText.setSelection(editText.getText().length());  // Move the cursor to the end of the existing text
-
-        // Show the soft keyboard
+        editText.setEnabled(true);
+        editText.requestFocus();
+        editText.setSelection(editText.getText().length());
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);  // Show the keyboard
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 
-    // Method to load saved personal details into the EditText fields
     private void loadPersonalDetails() {
         editName.setText(detailsManager.getSavedData("name"));
         editAge.setText(detailsManager.getSavedData("age"));
-        editGender.setText(detailsManager.getSavedData("gender"));
         editHeight.setText(detailsManager.getSavedData("height"));
         editWeight.setText(detailsManager.getSavedData("weight"));
         editSosContact.setText(detailsManager.getSavedData("sos_contact"));
+
+        String savedGender = detailsManager.getSavedData("gender");
+        if (savedGender != null) {
+            ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) genderSpinner.getAdapter();
+            int position = adapter.getPosition(savedGender);
+            genderSpinner.setSelection(position);
+        }
 
         String bmiCategory = detailsManager.getSavedData("bmi");
         if (!bmiCategory.isEmpty()) {
@@ -133,39 +123,38 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         }
     }
 
-    // Show the save button when any field is updated
     private void showSaveButton() {
-        if (isUpdated) {
-            saveButton.setVisibility(View.VISIBLE);  // Show the Save button
-        } else {
-            saveButton.setVisibility(View.GONE);  // Hide the Save button if no changes
-        }
+        saveButton.setVisibility(isUpdated ? View.VISIBLE : View.GONE);
     }
 
     public void onBackClicked(View view) {
-        saveAndUpdatePersonalDetails();
         finish();
+    }
+
+    public void onSaveClicked(View view) {
+        saveAndUpdatePersonalDetails();
+        isUpdated = false;
+        saveButton.setVisibility(View.GONE);
+        genderSpinner.setEnabled(false);
     }
 
     private void saveAndUpdatePersonalDetails() {
         if (isUpdated) {
-            // Save the values in the fields
             detailsManager.savePersonalDetails(
                     editName.getText().toString(),
                     editAge.getText().toString(),
-                    editGender.getText().toString(),
+                    genderSpinner.getSelectedItem().toString(),
                     editHeight.getText().toString(),
                     editWeight.getText().toString(),
                     editSosContact.getText().toString()
             );
 
-            // Calculate and update BMI
-            String bmiCategory = detailsManager.calculateAndSaveBMI(editHeight.getText().toString(), editWeight.getText().toString());
+            String bmiCategory = detailsManager.calculateAndSaveBMI(
+                    editHeight.getText().toString(),
+                    editWeight.getText().toString()
+            );
 
-            // Display BMI category
             bmiStatusText.setText("BMI Category: " + bmiCategory);
-
-            // Show a confirmation toast
             Toast.makeText(this, "Personal details saved!", Toast.LENGTH_SHORT).show();
         }
     }
