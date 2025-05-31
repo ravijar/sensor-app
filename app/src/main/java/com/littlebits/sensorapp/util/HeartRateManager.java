@@ -1,7 +1,6 @@
 package com.littlebits.sensorapp.util;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -13,7 +12,6 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -169,16 +167,6 @@ public class HeartRateManager {
                         redAvgList.clear();
                         redPeaksTimestamps.clear();
                         redAvgHistory.clear();
-                        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-                            @Override
-                            public void surfaceCreated(@NonNull SurfaceHolder holder) {}
-                            @Override
-                            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                                // No-op: frame analysis is handled by ImageReader
-                            }
-                            @Override
-                            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {}
-                        });
                     } catch (CameraAccessException e) {
                         if (listener != null) listener.onError("Camera session error: " + e.getMessage());
                     }
@@ -286,4 +274,4 @@ public class HeartRateManager {
             }
         }
     }
-} 
+}

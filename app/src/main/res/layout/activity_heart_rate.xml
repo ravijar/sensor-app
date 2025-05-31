@@ -21,14 +21,13 @@
         android:onClick="onBackClicked" />
 
     <!-- Animation -->
-    <ImageView
-        android:id="@+id/heartRateMonitor"
+    <SurfaceView
+        android:id="@+id/heartRateCameraSurface"
         android:layout_width="match_parent"
         android:layout_height="579dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/heart_rate_monitor" />
+        android:visibility="visible" /> <!-- Camera preview visible here -->
 
     <!-- Heart Rate Measurement -->
     <TextView
@@ -57,12 +56,5 @@
         android:textColor="@color/G150"
         android:textSize="24sp"
         android:onClick="onDoneClicked" />
-
-    <!-- Hidden SurfaceView for camera-based heart rate measurement -->
-    <SurfaceView
-        android:id="@+id/heartRateCameraSurface"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone" />
 
 </RelativeLayout>
