@@ -3,6 +3,7 @@ package com.littlebits.sensorapp.util;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,9 +13,12 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.Range;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -22,12 +26,9 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.graphics.ImageFormat;
-import android.media.Image;
-import android.media.ImageReader;
 
 public class HeartRateManager {
     public interface HeartRateListener {
@@ -50,13 +51,14 @@ public class HeartRateManager {
     private HandlerThread backgroundThread;
     private SurfaceView surfaceView;
     private boolean measuringWithCamera = false;
-    private List<Integer> redAvgList = new ArrayList<>();
-    private long startTime = 0;
     private ImageReader imageReader;
     private final List<Long> redPeaksTimestamps = new ArrayList<>();
     private final List<Integer> redAvgHistory = new ArrayList<>();
-    private static final int MEASUREMENT_DURATION_MS = 10000; // 10 seconds
-    private static final int FRAME_RATE = 15; // Target frame rate
+    private static final int MEASUREMENT_DURATION_MS = 15000;
+    private static final int FRAME_RATE = 30;
+    private int lastRedAvg = -1;
+    private boolean rising = false;
+    private long startTime = 0;
 
     public HeartRateManager(Context context) {
         this.context = context;
@@ -133,8 +135,8 @@ public class HeartRateManager {
         try {
             SurfaceHolder holder = surfaceView.getHolder();
             Surface surface = holder.getSurface();
-            int width = surfaceView.getWidth() > 0 ? surfaceView.getWidth() : 320;
-            int height = surfaceView.getHeight() > 0 ? surfaceView.getHeight() : 240;
+            int width = surfaceView.getWidth() > 0 ? surfaceView.getWidth() : 640;
+            int height = surfaceView.getHeight() > 0 ? surfaceView.getHeight() : 480;
             imageReader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 2);
             imageReader.setOnImageAvailableListener(reader -> {
                 Image image = null;
@@ -153,10 +155,13 @@ public class HeartRateManager {
                     if (image != null) image.close();
                 }
             }, backgroundHandler);
+
             previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             previewRequestBuilder.addTarget(surface);
             previewRequestBuilder.addTarget(imageReader.getSurface());
             previewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range<>(FRAME_RATE, FRAME_RATE));
+
             cameraDevice.createCaptureSession(List.of(surface, imageReader.getSurface()), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession session) {
@@ -164,7 +169,6 @@ public class HeartRateManager {
                     try {
                         captureSession.setRepeatingRequest(previewRequestBuilder.build(), null, backgroundHandler);
                         startTime = System.currentTimeMillis();
-                        redAvgList.clear();
                         redPeaksTimestamps.clear();
                         redAvgHistory.clear();
                     } catch (CameraAccessException e) {
@@ -182,50 +186,106 @@ public class HeartRateManager {
     }
 
     private int computeRedAverage(Image image) {
-        // YUV_420_888: Y is brightness, U/V are color. We'll use Y as a proxy for red intensity.
-        // For a more accurate result, convert YUV to RGB and use R, but Y is sufficient for pulse detection.
         Image.Plane yPlane = image.getPlanes()[0];
-        byte[] yBuffer = new byte[yPlane.getBuffer().remaining()];
-        yPlane.getBuffer().get(yBuffer);
+        Image.Plane uPlane = image.getPlanes()[1];
+        Image.Plane vPlane = image.getPlanes()[2];
+
+        ByteBuffer yBuffer = yPlane.getBuffer();
+        ByteBuffer uBuffer = uPlane.getBuffer();
+        ByteBuffer vBuffer = vPlane.getBuffer();
+
+        // Get plane properties
+        int yWidth = yPlane.getRowStride();
+        int yHeight = image.getHeight();
+        int uvWidth = uPlane.getRowStride();
+        int uvHeight = yHeight / 2;
+
+        // Safe guard against buffer overflow
+        int safeWidth = Math.min(yWidth, image.getWidth());
+        int safeHeight = Math.min(yHeight, image.getHeight());
+
         int sum = 0;
-        for (byte b : yBuffer) {
-            sum += (b & 0xFF);
+        int pixelCount = 0;
+
+        // Process Y plane (luminance)
+        for (int y = 0; y < safeHeight; y++) {
+            for (int x = 0; x < safeWidth; x++) {
+                if (yBuffer.remaining() > 0) {
+                    int yValue = yBuffer.get() & 0xFF;
+
+                    // Get corresponding UV values (subsampled)
+                    int uvX = x / 2;
+                    int uvY = y / 2;
+                    int uvIndex = uvY * uvWidth + uvX;
+
+                    // Safely get UV values
+                    int uValue = 128, vValue = 128; // Defaults
+                    if (uvIndex < uBuffer.remaining()) {
+                        uBuffer.position(uvIndex);
+                        uValue = uBuffer.get() & 0xFF;
+                    }
+                    if (uvIndex < vBuffer.remaining()) {
+                        vBuffer.position(uvIndex);
+                        vValue = vBuffer.get() & 0xFF;
+                    }
+
+                    // Convert YUV to RGB (simplified, focus on red channel)
+                    int r = (int) (yValue + 1.402 * (vValue - 128));
+                    sum += r;
+                    pixelCount++;
+                }
+            }
         }
-        return sum / yBuffer.length;
+
+        return pixelCount > 0 ? sum / pixelCount : 0;
     }
 
-    private int lastRedAvg = -1;
-    private boolean lastWasPeak = false;
     private void detectPeak(int redAvg, long timestamp) {
-        // Simple peak detection: look for a local minimum (valley) in the red signal
-        if (lastRedAvg != -1) {
-            if (!lastWasPeak && redAvg < lastRedAvg - 2) { // threshold = 2
-                // Detected a valley (pulse)
-                redPeaksTimestamps.add(timestamp);
-                lastWasPeak = true;
-            } else if (redAvg > lastRedAvg) {
-                lastWasPeak = false;
-            }
+        if (lastRedAvg == -1) {
+            lastRedAvg = redAvg;
+            return;
+        }
+
+        // Rising edge detection
+        if (redAvg > lastRedAvg) {
+            rising = true;
+        }
+        // Falling edge after a rising edge = peak
+        else if (rising && redAvg < lastRedAvg) {
+            redPeaksTimestamps.add(timestamp);
+            rising = false;
         }
         lastRedAvg = redAvg;
     }
 
     private void analyzePeaksAndFinish() {
         if (redPeaksTimestamps.size() < 2) {
-            if (listener != null) listener.onError("Not enough data to calculate heart rate");
+            if (listener != null) listener.onError("Not enough peaks detected");
             stopCameraMeasurement();
             return;
         }
-        // Calculate intervals between peaks
-        List<Long> intervals = new ArrayList<>();
+
+        // Filter out unrealistic intervals (40-200 BPM range)
+        List<Long> validIntervals = new ArrayList<>();
         for (int i = 1; i < redPeaksTimestamps.size(); i++) {
-            intervals.add(redPeaksTimestamps.get(i) - redPeaksTimestamps.get(i - 1));
+            long interval = redPeaksTimestamps.get(i) - redPeaksTimestamps.get(i - 1);
+            if (interval > 300 && interval < 1500) { // 300ms (200 BPM) to 1500ms (40 BPM)
+                validIntervals.add(interval);
+            }
         }
-        // Average interval in ms
-        long avgInterval = 0;
-        for (long interval : intervals) avgInterval += interval;
-        avgInterval /= intervals.size();
-        int heartRate = (int) (60000 / avgInterval); // bpm
+
+        if (validIntervals.size() < 2) {
+            if (listener != null) listener.onError("No valid heart rate detected");
+            stopCameraMeasurement();
+            return;
+        }
+
+        // Calculate average BPM
+        long avgInterval = validIntervals.stream().reduce(0L, Long::sum) / validIntervals.size();
+        int heartRate = (int) (60000 / avgInterval);
+
+        // Clamp to realistic range
+        heartRate = Math.max(40, Math.min(heartRate, 200));
         if (listener != null) listener.onHeartRateMeasured(heartRate);
         stopCameraMeasurement();
     }
