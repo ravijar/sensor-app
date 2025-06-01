@@ -36,11 +36,15 @@ public class SpeedCounter implements SensorObserver {
     private boolean isPaused = false;
 
     private long lastSensorTime = 0;
+    private long sessionStartTime = 0;
+
     private final double[] velocityEstimate = {0.0, 0.0, 0.0};
     private final float[][] kalmanP = new float[3][3];
     private final float q = 0.01f;
     private final float r = 0.5f;
-    private double velocity = 0.0;
+    private double distanceSumMeters = 0.0;
+
+    private double lastSpeedKmph = 0.0;
     private long lastActiveTime = 0;
 
     private final LocationListener gpsListener = new LocationListener() {
@@ -49,8 +53,12 @@ public class SpeedCounter implements SensorObserver {
             gpsWorking = true;
             if (lastLocation != null && !isPaused) {
                 float speed = location.getSpeed(); // m/s
-                velocity = speed * 3.6;
-                if (listener != null) listener.onSpeedChanged(velocity);
+                lastSpeedKmph = speed * 3.6;
+                long now = SystemClock.elapsedRealtime();
+                float dt = (lastSensorTime == 0) ? 0 : (now - lastSensorTime) / 1000f;
+                if (dt > 0) distanceSumMeters += (speed * dt);
+                lastSensorTime = now;
+                if (listener != null) listener.onSpeedChanged(getAverageSpeed());
             }
             lastLocation = location;
         }
@@ -69,6 +77,7 @@ public class SpeedCounter implements SensorObserver {
 
     public void start(SpeedListener listener) {
         this.listener = listener;
+        sessionStartTime = SystemClock.elapsedRealtime();
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
@@ -139,18 +148,26 @@ public class SpeedCounter implements SensorObserver {
             double vz = velocityEstimate[2] * dt;
 
             double v = Math.sqrt(vx * vx + vy * vy + vz * vz);
-            velocity = 0.8 * velocity + 0.2 * (v * 3.6); // smooth transition
+            lastSpeedKmph = 0.8 * lastSpeedKmph + 0.2 * (v * 3.6);
+            distanceSumMeters += v;
+
             lastActiveTime = now;
 
             if (!gpsWorking && listener != null) {
-                listener.onSpeedChanged(Math.max(0, velocity));
+                listener.onSpeedChanged(getAverageSpeed());
             }
         }
 
-        // Inactivity decay
         if (now - lastActiveTime > 4000) {
-            velocity *= 0.9;
-            if (listener != null) listener.onSpeedChanged(Math.max(0, velocity));
+            lastSpeedKmph *= 0.9;
+            if (listener != null) listener.onSpeedChanged(getAverageSpeed());
         }
+    }
+
+    private double getAverageSpeed() {
+        long elapsedMillis = SystemClock.elapsedRealtime() - sessionStartTime;
+        if (elapsedMillis <= 0) return 0.0;
+        double elapsedHours = elapsedMillis / 3600000.0;
+        return (distanceSumMeters / 1000.0) / elapsedHours;
     }
 }
