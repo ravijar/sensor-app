@@ -11,37 +11,40 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.model.Workout;
+import com.littlebits.sensorapp.repository.WorkoutRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PastWorkoutsActivity extends AppCompatActivity {
 
     private LinearLayout workoutLayout;
-
     private List<Workout> workoutList;
+    private WorkoutRepository workoutRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_past_workouts);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
 
         workoutLayout = findViewById(R.id.workoutLayout);
+        workoutRepository = new WorkoutRepository(this);
 
-        workoutList = new ArrayList<>();
-        workoutList.add(new Workout("Monday, 04", "March 2025", "8.00-10.00"));
-        workoutList.add(new Workout("Tuesday, 05", "March 2025", "9.00-11.00"));
-        workoutList.add(new Workout("Wednesday, 06", "March 2025", "10.00-12.00"));
-
-        populateWorkoutList();
+        loadWorkoutsFromDatabase();
     }
 
     public void onBackClicked(View view) {
         finish();
+    }
+
+    private void loadWorkoutsFromDatabase() {
+        workoutList = workoutRepository.getAllWorkouts();
+        if (workoutList != null && !workoutList.isEmpty()) {
+            populateWorkoutList();
+        } else {
+            // Optional: show a message like "No workouts recorded yet"
+        }
     }
 
     private void populateWorkoutList() {
@@ -68,13 +71,9 @@ public class PastWorkoutsActivity extends AppCompatActivity {
         }
     }
 
-    // Method called when a "View Workout" button is clicked
-    public void onViewWorkoutClicked(Workout workout) {
-        // You can pass workout details to the next activity (e.g., WorkoutSummaryActivity)
+    private void onViewWorkoutClicked(Workout workout) {
         Intent intent = new Intent(this, WorkoutSummaryActivity.class);
-        intent.putExtra("workout_date", workout.getDate());
-        intent.putExtra("workout_time", workout.getDuration());
-        intent.putExtra("workout_month_year", workout.getMonthYear());
+        intent.putExtra("workout_obj", workout); // 💡 Passed as serializable object
         startActivity(intent);
     }
 }

@@ -1,6 +1,8 @@
 package com.littlebits.sensorapp.model;
 
-public class Workout {
+import java.io.Serializable;
+
+public class Workout implements Serializable {
     private String date;
     private String monthYear;
     private String duration;

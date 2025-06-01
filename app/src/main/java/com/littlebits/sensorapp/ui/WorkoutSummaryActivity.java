@@ -7,6 +7,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.model.Workout;
+
+import java.util.Locale;
 
 public class WorkoutSummaryActivity extends AppCompatActivity {
 
@@ -26,21 +29,29 @@ public class WorkoutSummaryActivity extends AppCompatActivity {
 
         // Initialize UI components
         timerText = findViewById(R.id.timer);
-
         stepsCount = findViewById(R.id.stepsCount);
         distanceCount = findViewById(R.id.distanceCount);
         speedCount = findViewById(R.id.speedCount);
         altitudeCount = findViewById(R.id.altitudeCount);
         caloriesCount = findViewById(R.id.caloriesCount);
 
-        // Set initial data values (these can be dynamic based on the actual workout data)
-        timerText.setText("00 : 30 : 00");
-        stepsCount.setText("250");
-        distanceCount.setText("200 M");
-        speedCount.setText("20 km/h");
-        altitudeCount.setText("+20 m");
-        caloriesCount.setText("18 g");
+        // Get workout from Intent
+        Workout workout = (Workout) getIntent().getSerializableExtra("workout_obj");
+        if (workout != null) {
+            timerText.setText(formatSeconds(workout.getTime()));
+            stepsCount.setText(String.valueOf(workout.getSteps()));
+            distanceCount.setText(String.format(Locale.getDefault(), "%.0f", workout.getDistance()));
+            speedCount.setText(String.format(Locale.getDefault(), "%.1f", workout.getSpeed()));
+            altitudeCount.setText(String.format(Locale.getDefault(), "%.0f", workout.getAltitude()));
+            caloriesCount.setText(String.format(Locale.getDefault(), "%.0f", workout.getCalories()));
+        }
+    }
 
+    private String formatSeconds(int totalSeconds) {
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+        return String.format(Locale.getDefault(), "%02d : %02d : %02d", hours, minutes, seconds);
     }
 
     public void onBackClicked(View view) {
