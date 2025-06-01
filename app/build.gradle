@@ -48,4 +48,5 @@ dependencies {
     implementation libs.tensorflow.android
     implementation libs.volley
     implementation libs.play.services.location
+    implementation libs.tensorflow.lite
 }

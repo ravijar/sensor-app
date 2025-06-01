@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SensorObserver {
-    private final int TIME_STAMP = 100;
+    private static final int TIME_STAMP = 100;
 
     private ActivityClassifier classifier;
     private XYZFloatSensor accelerometer, gyroscope, linearAcceleration;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
         bikingTextView = findViewById(R.id.biking_TextView);
         downstairsTextView = findViewById(R.id.downstairs_TextView);
         joggingTextView = findViewById(R.id.jogging_TextView);
-        sittingTextView  = findViewById(R.id.sitting_TextView);
+        sittingTextView = findViewById(R.id.sitting_TextView);
         standingTextView = findViewById(R.id.standing_TextView);
         upstairsTextView = findViewById(R.id.upstairs_TextView);
         walkingTextView = findViewById(R.id.walking_TextView);
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
         gx=new ArrayList<>(); gy=new ArrayList<>(); gz=new ArrayList<>();
         lx=new ArrayList<>(); ly=new ArrayList<>(); lz=new ArrayList<>();
 
-        classifier=new ActivityClassifier(getApplicationContext());
+        classifier = new ActivityClassifier(getApplicationContext());
 
         accelerometer = (XYZFloatSensor) SensorRepository.getInstance().getSensor(Sensor.TYPE_ACCELEROMETER);
         gyroscope = (XYZFloatSensor) SensorRepository.getInstance().getSensor(Sensor.TYPE_GYROSCOPE);
@@ -59,51 +59,45 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
     }
 
     private void predictActivity() {
-        List<Float> data=new ArrayList<>();
-        if (ax.size() >= TIME_STAMP && ay.size() >= TIME_STAMP && az.size() >= TIME_STAMP
-                && gx.size() >= TIME_STAMP && gy.size() >= TIME_STAMP && gz.size() >= TIME_STAMP
-                && lx.size() >= TIME_STAMP && ly.size() >= TIME_STAMP && lz.size() >= TIME_STAMP) {
-            data.addAll(ax.subList(0,TIME_STAMP));
-            data.addAll(ay.subList(0,TIME_STAMP));
-            data.addAll(az.subList(0,TIME_STAMP));
+        if (ax.size() >= TIME_STAMP && ay.size() >= TIME_STAMP && az.size() >= TIME_STAMP &&
+                gx.size() >= TIME_STAMP && gy.size() >= TIME_STAMP && gz.size() >= TIME_STAMP &&
+                lx.size() >= TIME_STAMP && ly.size() >= TIME_STAMP && lz.size() >= TIME_STAMP) {
 
-            data.addAll(gx.subList(0,TIME_STAMP));
-            data.addAll(gy.subList(0,TIME_STAMP));
-            data.addAll(gz.subList(0,TIME_STAMP));
+            List<Float> data = new ArrayList<>();
+            for (int i = 0; i < TIME_STAMP; i++) {
+                data.add(ax.get(i)); data.add(ay.get(i)); data.add(az.get(i));
+                data.add(gx.get(i)); data.add(gy.get(i)); data.add(gz.get(i));
+                data.add(lx.get(i)); data.add(ly.get(i)); data.add(lz.get(i));
+            }
 
-            data.addAll(lx.subList(0,TIME_STAMP));
-            data.addAll(ly.subList(0,TIME_STAMP));
-            data.addAll(lz.subList(0,TIME_STAMP));
+            float[] input = toFloatArray(data);
+            results = classifier.predictProbabilities(input);
 
-            results = classifier.predictProbabilities(toFloatArray(data));
+            // Mapping from index to activity
+            bikingTextView.setText("Biking: " + round(results[0], 2));
+            downstairsTextView.setText("Downstairs: " + round(results[1], 2));
+            joggingTextView.setText("Jogging: " + round(results[2], 2));
+            sittingTextView.setText("Sitting: " + round(results[3], 2));
+            upstairsTextView.setText("Upstairs: " + round(results[4], 2));
+            standingTextView.setText("Standing: " + round(results[5], 2));
+            walkingTextView.setText("Walking: " + round(results[6], 2));
 
-            bikingTextView.setText("Biking: \t" + round(results[0],2));
-            downstairsTextView.setText("DownStairs: \t" + round(results[1],2));
-            joggingTextView.setText("Jogging: \t" + round(results[2],2));
-            sittingTextView.setText("Sitting: \t" + round(results[3],2));
-            standingTextView.setText("Standing: \t" + round(results[4],2));
-            upstairsTextView.setText("Upstairs: \t" + round(results[5],2));;
-            walkingTextView.setText("Walking: \t" + round(results[6],2));
-
-
-            data.clear();
             ax.clear(); ay.clear(); az.clear();
             gx.clear(); gy.clear(); gz.clear();
-            lx.clear();ly.clear(); lz.clear();
+            lx.clear(); ly.clear(); lz.clear();
         }
     }
 
-    private float round(float value, int decimal_places) {
-        BigDecimal bigDecimal=new BigDecimal(Float.toString(value));
-        bigDecimal = bigDecimal.setScale(decimal_places, BigDecimal.ROUND_HALF_UP);
+    private float round(float value, int decimalPlaces) {
+        BigDecimal bigDecimal = new BigDecimal(Float.toString(value));
+        bigDecimal = bigDecimal.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
         return bigDecimal.floatValue();
     }
 
     private float[] toFloatArray(List<Float> data) {
-        int i=0;
-        float[] array=new float[data.size()];
-        for (Float f:data) {
-            array[i++] = (f != null ? f: Float.NaN);
+        float[] array = new float[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            array[i] = (data.get(i) != null) ? data.get(i) : Float.NaN;
         }
         return array;
     }
@@ -113,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
         super.onResume();
         accelerometer.register();
         gyroscope.register();
+        linearAcceleration.register();
     }
 
     @Override
@@ -120,16 +115,15 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
         super.onPause();
         accelerometer.unregister();
         gyroscope.unregister();
+        linearAcceleration.unregister();
     }
 
     public void openAvailableSensors(View view) {
-        Intent intent = new Intent(this, AvailableSensorsActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, AvailableSensorsActivity.class));
     }
 
     public void openHome(View view) {
-        Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, HomeActivity.class));
     }
 
     @Override
@@ -139,14 +133,17 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
                 ax.add(accelerometer.getX());
                 ay.add(accelerometer.getY());
                 az.add(accelerometer.getZ());
+                break;
             case Sensor.TYPE_GYROSCOPE:
                 gx.add(gyroscope.getX());
                 gy.add(gyroscope.getY());
                 gz.add(gyroscope.getZ());
+                break;
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 lx.add(linearAcceleration.getX());
                 ly.add(linearAcceleration.getY());
                 lz.add(linearAcceleration.getZ());
+                break;
         }
 
         predictActivity();
