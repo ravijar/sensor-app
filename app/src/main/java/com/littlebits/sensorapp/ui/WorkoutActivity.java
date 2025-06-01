@@ -8,15 +8,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.util.StepsCounter;
 import com.littlebits.sensorapp.util.WorkoutTimer;
 
 public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.TimerListener {
 
     private TextView timerTextView;
+    private TextView stepCountTextView;
+
     private Button endWorkoutButton;
     private ImageView pauseButton;
 
     private WorkoutTimer workoutTimer;
+    private StepsCounter stepsCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         timerTextView = findViewById(R.id.timer);
         endWorkoutButton = findViewById(R.id.endWorkoutButton);
         pauseButton = findViewById(R.id.pauseButton);
+        stepCountTextView = findViewById(R.id.stepCountText);
 
         // Initialize WorkoutTimer
         workoutTimer = new WorkoutTimer(this);
@@ -46,9 +51,15 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         // Start timer
         workoutTimer.startTimer();
 
-        // Set button click listeners
-        endWorkoutButton.setOnClickListener(v -> finishWorkout());
+        // Start step counter and update UI
+        stepsCounter = new StepsCounter(this);
+        stepsCounter.start(totalSteps -> {
+            if (totalSteps >= 0 && stepCountTextView != null) {
+                runOnUiThread(() -> stepCountTextView.setText(String.valueOf(totalSteps)));
+            }
+        });
 
+        endWorkoutButton.setOnClickListener(v -> finishWorkout());
         pauseButton.setOnClickListener(v -> togglePause());
     }
 
@@ -60,16 +71,23 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private void togglePause() {
         if (workoutTimer.isRunning()) {
             workoutTimer.pauseTimer();
-            pauseButton.setImageResource(R.drawable.ic_play); // Update icon to play
+            pauseButton.setImageResource(R.drawable.ic_play);
         } else {
             workoutTimer.resumeTimer();
-            pauseButton.setImageResource(R.drawable.ic_pause); // Update icon to pause
+            pauseButton.setImageResource(R.drawable.ic_pause);
         }
     }
 
     private void finishWorkout() {
         workoutTimer.stopTimer();
-        finish(); // Close activity
+        if (stepsCounter != null) stepsCounter.stop();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (stepsCounter != null) stepsCounter.stop();
+        super.onBackPressed();
     }
 
     @Override

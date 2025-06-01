@@ -102,9 +102,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/stepCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@color/black"/>
 
