@@ -18,7 +18,7 @@ import androidx.core.content.ContextCompat;
 import android.content.res.ColorStateList;
 
 import com.littlebits.sensorapp.R;
-import com.littlebits.sensorapp.util.PersonalDetailsManager;
+import com.littlebits.sensorapp.manager.PersonalDetailsManager;
 
 public class PersonalDetailsActivity extends AppCompatActivity {
 

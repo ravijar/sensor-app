@@ -33,23 +33,40 @@ public class SpeedCounter implements SensorObserver {
 
     private boolean gpsWorking = false;
     private boolean sensorsWorking = false;
+    private boolean isPaused = false;
 
     private long lastSensorTime = 0;
+    private long sessionStartTime = 0;
+
     private final double[] velocityEstimate = {0.0, 0.0, 0.0};
     private final float[][] kalmanP = new float[3][3];
     private final float q = 0.01f;
     private final float r = 0.5f;
-    private double velocity = 0.0;
+
+    private double distanceSumMeters = 0.0;
+    private double lastSpeedKmph = 0.0;
+    private double averageSpeedKmph = 0.0;
+
     private long lastActiveTime = 0;
 
     private final LocationListener gpsListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             gpsWorking = true;
-            if (lastLocation != null) {
+            if (lastLocation != null && !isPaused) {
                 float speed = location.getSpeed(); // m/s
-                velocity = speed * 3.6;
-                if (listener != null) listener.onSpeedChanged(velocity);
+                lastSpeedKmph = speed * 3.6;
+
+                long now = SystemClock.elapsedRealtime();
+                float dt = (lastSensorTime == 0) ? 0 : (now - lastSensorTime) / 1000f;
+                if (dt > 0) {
+                    distanceSumMeters += (speed * dt);
+                    updateAverageSpeed();
+                }
+
+                lastSensorTime = now;
+
+                if (listener != null) listener.onSpeedChanged(lastSpeedKmph);
             }
             lastLocation = location;
         }
@@ -68,6 +85,7 @@ public class SpeedCounter implements SensorObserver {
 
     public void start(SpeedListener listener) {
         this.listener = listener;
+        sessionStartTime = SystemClock.elapsedRealtime();
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
@@ -94,9 +112,27 @@ public class SpeedCounter implements SensorObserver {
         }
     }
 
+    public void pause() {
+        isPaused = true;
+        if (accelSensor != null) accelSensor.unregister();
+        if (gyroSensor != null) gyroSensor.unregister();
+        locationManager.removeUpdates(gpsListener);
+    }
+
+    public void resume() {
+        isPaused = false;
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
+        }
+
+        if (accelSensor != null) accelSensor.register();
+        if (gyroSensor != null) gyroSensor.register();
+    }
+
     @Override
     public void onSensorChanged(int sensorType) {
-        if (!sensorsWorking || sensorType != Sensor.TYPE_ACCELEROMETER) return;
+        if (isPaused || !sensorsWorking || sensorType != Sensor.TYPE_ACCELEROMETER) return;
 
         XYZFloatSensor acc = (XYZFloatSensor) accelSensor;
         float[] a = new float[]{acc.getX(), acc.getY(), acc.getZ() - 9.8f};
@@ -120,18 +156,33 @@ public class SpeedCounter implements SensorObserver {
             double vz = velocityEstimate[2] * dt;
 
             double v = Math.sqrt(vx * vx + vy * vy + vz * vz);
-            velocity = 0.8 * velocity + 0.2 * (v * 3.6); // smooth transition
+            lastSpeedKmph = 0.8 * lastSpeedKmph + 0.2 * (v * 3.6);
+            distanceSumMeters += v;
+
             lastActiveTime = now;
 
+            updateAverageSpeed();
+
             if (!gpsWorking && listener != null) {
-                listener.onSpeedChanged(Math.max(0, velocity));
+                listener.onSpeedChanged(lastSpeedKmph);
             }
         }
 
-        // Inactivity decay
         if (now - lastActiveTime > 4000) {
-            velocity *= 0.9;
-            if (listener != null) listener.onSpeedChanged(Math.max(0, velocity));
+            lastSpeedKmph *= 0.9;
+            updateAverageSpeed();
+            if (listener != null) listener.onSpeedChanged(lastSpeedKmph);
         }
+    }
+
+    private void updateAverageSpeed() {
+        long elapsedMillis = SystemClock.elapsedRealtime() - sessionStartTime;
+        if (elapsedMillis <= 0) return;
+        double elapsedHours = elapsedMillis / 3600000.0;
+        averageSpeedKmph = (distanceSumMeters / 1000.0) / elapsedHours;
+    }
+
+    public double getAverageSpeed() {
+        return averageSpeedKmph;
     }
 }

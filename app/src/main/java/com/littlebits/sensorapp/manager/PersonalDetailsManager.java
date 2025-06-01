@@ -1,4 +1,4 @@
-package com.littlebits.sensorapp.util;
+package com.littlebits.sensorapp.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;

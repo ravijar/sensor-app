@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.littlebits.sensorapp.R;
-import com.littlebits.sensorapp.util.HeartRateManager;
+import com.littlebits.sensorapp.manager.HeartRateManager;
 
 public class HeartRateActivity extends AppCompatActivity {
 
