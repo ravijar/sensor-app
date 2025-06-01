@@ -1,10 +1,22 @@
 package com.littlebits.sensorapp.ui;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.manager.WorkoutManager;
 import com.littlebits.sensorapp.model.Workout;
@@ -22,6 +34,8 @@ public class WorkoutActivity extends AppCompatActivity {
     private ImageView pauseButton;
 
     private WorkoutManager workoutManager;
+
+    private Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +65,8 @@ public class WorkoutActivity extends AppCompatActivity {
         );
 
         workoutManager.init(savedInstanceState);
+
+        fetchLocation(this);
 
         endWorkoutButton.setOnClickListener(v -> {
             Workout workout = workoutManager.getCurrentWorkout();
@@ -88,5 +104,53 @@ public class WorkoutActivity extends AppCompatActivity {
     public void onBackPressed() {
         workoutManager.stopAll();
         super.onBackPressed();
+    }
+
+    private void fetchLocation(Context context) {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                currentLocation = location;
+            }
+        });
+    }
+
+
+    private Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void onHeartRateClick(View view) {
+        startActivity(new Intent(this, HeartRateActivity.class));
+    }
+
+    public void onMapClick(View view) {
+        Location location = getCurrentLocation();
+
+        String uri;
+        if (location != null) {
+            // If location is available, open Google Maps with current coordinates
+            double lat = location.getLatitude();
+            double lon = location.getLongitude();
+            uri = "geo:" + lat + "," + lon + "?q=" + lat + "," + lon + "(My+Current+Location)";
+        } else {
+            // Default fallback location: University of Moratuwa
+            uri = "geo:6.7968,79.9011?q=University+of+Moratuwa";
+        }
+
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        try {
+            startActivity(mapIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Google Maps not installed", Toast.LENGTH_LONG).show();
+        }
     }
 }

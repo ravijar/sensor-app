@@ -412,7 +412,8 @@
                 android:background="@drawable/card_background"
                 android:backgroundTint="@color/P2"
                 android:src="@drawable/ic_heart_rate"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                android:onClick="onHeartRateClick"/>
 
             <!-- Location -->
             <ImageView
@@ -422,7 +423,8 @@
                 android:background="@drawable/card_background"
                 android:backgroundTint="@color/G900"
                 android:src="@drawable/ic_location_l"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                android:onClick="onMapClick"/>
 
             <!-- SOS Button -->
             <ImageView
