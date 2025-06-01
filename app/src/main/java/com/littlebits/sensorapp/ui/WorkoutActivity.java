@@ -21,6 +21,7 @@ import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.manager.WorkoutManager;
 import com.littlebits.sensorapp.model.Workout;
 import com.littlebits.sensorapp.repository.WorkoutRepository;
+import com.littlebits.sensorapp.util.SOSDialer;
 
 public class WorkoutActivity extends AppCompatActivity {
 
@@ -152,5 +153,9 @@ public class WorkoutActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Google Maps not installed", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void onSOSClick(View view) {
+        SOSDialer.dialSOS(this);
     }
 }

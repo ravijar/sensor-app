@@ -434,7 +434,8 @@
                 android:background="@drawable/card_background"
                 android:backgroundTint="@color/W1"
                 android:src="@drawable/ic_sos"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                android:onClick="onSOSClick"/>
 
             <!-- Pause -->
             <ImageView
