@@ -58,7 +58,7 @@ public class PastWorkoutsActivity extends AppCompatActivity {
             // Set the workout data to the template's views
             workoutDate.setText(workout.getDate());
             workoutMonthYear.setText(workout.getMonthYear());
-            workoutTime.setText(workout.getTime());
+            workoutTime.setText(workout.getDuration());
 
             // Set the button click listener for "View Workout"
             viewButton.setOnClickListener(v -> onViewWorkoutClicked(workout));
@@ -73,7 +73,7 @@ public class PastWorkoutsActivity extends AppCompatActivity {
         // You can pass workout details to the next activity (e.g., WorkoutSummaryActivity)
         Intent intent = new Intent(this, WorkoutSummaryActivity.class);
         intent.putExtra("workout_date", workout.getDate());
-        intent.putExtra("workout_time", workout.getTime());
+        intent.putExtra("workout_time", workout.getDuration());
         intent.putExtra("workout_month_year", workout.getMonthYear());
         startActivity(intent);
     }

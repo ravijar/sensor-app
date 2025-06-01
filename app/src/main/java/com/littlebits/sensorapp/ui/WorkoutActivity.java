@@ -7,6 +7,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.manager.WorkoutManager;
+import com.littlebits.sensorapp.model.Workout;
+import com.littlebits.sensorapp.repository.WorkoutRepository;
 
 public class WorkoutActivity extends AppCompatActivity {
 
@@ -51,7 +53,13 @@ public class WorkoutActivity extends AppCompatActivity {
         workoutManager.init(savedInstanceState);
 
         endWorkoutButton.setOnClickListener(v -> {
+            Workout workout = workoutManager.getCurrentWorkout();
             workoutManager.stopAll();
+
+            try (WorkoutRepository db = new WorkoutRepository(this)) {
+                db.saveWorkout(workout);
+            }
+
             finish();
         });
 

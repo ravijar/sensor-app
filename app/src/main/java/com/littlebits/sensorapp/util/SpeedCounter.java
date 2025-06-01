@@ -42,9 +42,11 @@ public class SpeedCounter implements SensorObserver {
     private final float[][] kalmanP = new float[3][3];
     private final float q = 0.01f;
     private final float r = 0.5f;
-    private double distanceSumMeters = 0.0;
 
+    private double distanceSumMeters = 0.0;
     private double lastSpeedKmph = 0.0;
+    private double averageSpeedKmph = 0.0;
+
     private long lastActiveTime = 0;
 
     private final LocationListener gpsListener = new LocationListener() {
@@ -54,11 +56,17 @@ public class SpeedCounter implements SensorObserver {
             if (lastLocation != null && !isPaused) {
                 float speed = location.getSpeed(); // m/s
                 lastSpeedKmph = speed * 3.6;
+
                 long now = SystemClock.elapsedRealtime();
                 float dt = (lastSensorTime == 0) ? 0 : (now - lastSensorTime) / 1000f;
-                if (dt > 0) distanceSumMeters += (speed * dt);
+                if (dt > 0) {
+                    distanceSumMeters += (speed * dt);
+                    updateAverageSpeed();
+                }
+
                 lastSensorTime = now;
-                if (listener != null) listener.onSpeedChanged(getAverageSpeed());
+
+                if (listener != null) listener.onSpeedChanged(lastSpeedKmph);
             }
             lastLocation = location;
         }
@@ -153,21 +161,28 @@ public class SpeedCounter implements SensorObserver {
 
             lastActiveTime = now;
 
+            updateAverageSpeed();
+
             if (!gpsWorking && listener != null) {
-                listener.onSpeedChanged(getAverageSpeed());
+                listener.onSpeedChanged(lastSpeedKmph);
             }
         }
 
         if (now - lastActiveTime > 4000) {
             lastSpeedKmph *= 0.9;
-            if (listener != null) listener.onSpeedChanged(getAverageSpeed());
+            updateAverageSpeed();
+            if (listener != null) listener.onSpeedChanged(lastSpeedKmph);
         }
     }
 
-    private double getAverageSpeed() {
+    private void updateAverageSpeed() {
         long elapsedMillis = SystemClock.elapsedRealtime() - sessionStartTime;
-        if (elapsedMillis <= 0) return 0.0;
+        if (elapsedMillis <= 0) return;
         double elapsedHours = elapsedMillis / 3600000.0;
-        return (distanceSumMeters / 1000.0) / elapsedHours;
+        averageSpeedKmph = (distanceSumMeters / 1000.0) / elapsedHours;
+    }
+
+    public double getAverageSpeed() {
+        return averageSpeedKmph;
     }
 }

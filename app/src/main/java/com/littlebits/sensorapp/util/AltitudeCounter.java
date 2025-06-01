@@ -115,4 +115,8 @@ public class AltitudeCounter implements SensorObserver {
         }
         lastAltitude = currentAltitude;
     }
+
+    public float getCumulativeAltitudeGain() {
+        return cumulativeAltitudeGain;
+    }
 }

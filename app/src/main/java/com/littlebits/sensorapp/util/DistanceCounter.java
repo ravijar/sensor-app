@@ -25,8 +25,9 @@ public class DistanceCounter implements SensorObserver {
 
     private int initialSteps = -1;
     private int estimatedSteps = 0;
-    private static final double AVERAGE_STEP_LENGTH_M = 0.78;
+    private double currentDistance = 0.0;
 
+    private static final double AVERAGE_STEP_LENGTH_M = 0.78;
     private long lastStepTime = 0;
     private static final long STEP_DEBOUNCE_MS = 300;
 
@@ -71,6 +72,7 @@ public class DistanceCounter implements SensorObserver {
 
         initialSteps = -1;
         estimatedSteps = 0;
+        currentDistance = 0.0;
     }
 
     public void pause() {
@@ -93,8 +95,8 @@ public class DistanceCounter implements SensorObserver {
             int totalSteps = (int) ((XFloatSensor) stepSensor).getX();
             if (initialSteps == -1) initialSteps = totalSteps;
             int deltaSteps = totalSteps - initialSteps;
-            double distance = deltaSteps * AVERAGE_STEP_LENGTH_M;
-            if (listener != null) listener.onDistanceChanged(distance);
+            currentDistance = deltaSteps * AVERAGE_STEP_LENGTH_M;
+            if (listener != null) listener.onDistanceChanged(currentDistance);
         }
 
         else if (sensorType == Sensor.TYPE_ACCELEROMETER) {
@@ -107,17 +109,20 @@ public class DistanceCounter implements SensorObserver {
             if (wasFalling && z - lastZ > 2.0 && (currentTime - lastStepTime) > STEP_DEBOUNCE_MS) {
                 estimatedSteps++;
                 lastStepTime = currentTime;
-                double distance = estimatedSteps * AVERAGE_STEP_LENGTH_M;
-                if (listener != null) listener.onDistanceChanged(distance);
+                currentDistance = estimatedSteps * AVERAGE_STEP_LENGTH_M;
+                if (listener != null) listener.onDistanceChanged(currentDistance);
                 wasFalling = false;  // reset state
             }
 
-            // Detect fall phase
             if (lastZ - z > 1.5) {
                 wasFalling = true;
             }
 
             lastZ = z;
         }
+    }
+
+    public double getCurrentDistance() {
+        return currentDistance;
     }
 }

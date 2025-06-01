@@ -8,12 +8,14 @@ import android.widget.TextView;
 
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.model.ActivityLabel;
+import com.littlebits.sensorapp.model.Workout;
 import com.littlebits.sensorapp.repository.SensorRepository;
 import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
 import com.littlebits.sensorapp.util.ActivityClassifier;
 import com.littlebits.sensorapp.util.AltitudeCounter;
 import com.littlebits.sensorapp.util.CalorieCounter;
+import com.littlebits.sensorapp.util.DateTimeFormatter;
 import com.littlebits.sensorapp.util.DistanceCounter;
 import com.littlebits.sensorapp.util.SpeedCounter;
 import com.littlebits.sensorapp.util.StepsCounter;
@@ -37,6 +39,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
     private ActivityClassifier classifier;
 
     private ActivityLabel currentActivity = ActivityLabel.SITTING;
+    private long startMillis;
 
     private XYZFloatSensor accelerometer, gyroscope, linearAcceleration;
     private final List<Float> ax = new ArrayList<>(), ay = new ArrayList<>(), az = new ArrayList<>();
@@ -63,6 +66,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
     }
 
     public void init(Bundle savedInstanceState) {
+        startMillis = System.currentTimeMillis();
         workoutTimer = new WorkoutTimer(this);
         if (savedInstanceState != null) {
             workoutTimer.saveState(
@@ -209,4 +213,22 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         outState.putBoolean("running", workoutTimer.isRunning());
         outState.putBoolean("wasRunning", workoutTimer.wasRunning());
     }
+
+    public Workout getCurrentWorkout() {
+        Workout workout = new Workout(
+                DateTimeFormatter.getCurrentDateFormatted(),
+                DateTimeFormatter.getCurrentMonthYearFormatted(),
+                DateTimeFormatter.getWorkoutDuration(startMillis, System.currentTimeMillis())
+        );
+
+        workout.setTime(workoutTimer.getSeconds());
+        workout.setSteps(stepsCounter.getCurrentStepCount());
+        workout.setDistance(distanceCounter.getCurrentDistance());
+        workout.setSpeed(speedCounter.getAverageSpeed());
+        workout.setAltitude(altitudeCounter.getCumulativeAltitudeGain());
+        workout.setCalories(calorieCounter.getTotalCalories());
+
+        return workout;
+    }
+
 }

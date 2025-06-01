@@ -25,6 +25,7 @@ public class StepsCounter implements SensorObserver {
 
     private int initialStepCount = -1;
     private int fallbackStepCount = 0;
+    private int currentStepCount = 0;
 
     private float lastAccelZ = 0;
     private float lastGyroZ = 0;
@@ -108,8 +109,8 @@ public class StepsCounter implements SensorObserver {
         if (sensorType == Sensor.TYPE_STEP_COUNTER) {
             int total = (int) ((XFloatSensor) stepSensor).getX();
             if (initialStepCount == -1) initialStepCount = total;
-            int relativeSteps = total - initialStepCount;
-            if (listener != null) listener.onStepDetected(relativeSteps);
+            currentStepCount = total - initialStepCount;
+            if (listener != null) listener.onStepDetected(currentStepCount);
         }
 
         else if (sensorType == Sensor.TYPE_ACCELEROMETER) {
@@ -122,7 +123,8 @@ public class StepsCounter implements SensorObserver {
                 if (lastGyroZ > GYRO_THRESHOLD && (currentTime - lastStepTime > STEP_INTERVAL_MS)) {
                     fallbackStepCount++;
                     lastStepTime = currentTime;
-                    if (listener != null) listener.onStepDetected(fallbackStepCount);
+                    currentStepCount = fallbackStepCount;
+                    if (listener != null) listener.onStepDetected(currentStepCount);
                 }
             }
 
@@ -134,5 +136,9 @@ public class StepsCounter implements SensorObserver {
             float z = ((XYZFloatSensor) gyroSensor).getZ();
             lastGyroZ = Math.abs(z);
         }
+    }
+
+    public int getCurrentStepCount() {
+        return currentStepCount;
     }
 }
