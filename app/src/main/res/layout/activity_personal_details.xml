@@ -139,7 +139,7 @@
         <LinearLayout
             android:id="@+id/genderField"
             android:layout_width="200dp"
-            android:layout_height="wrap_content"
+            android:layout_height="43dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/personal_details_field"
             android:gravity="center_vertical"

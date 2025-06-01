@@ -13,6 +13,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import android.content.res.ColorStateList;
 
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.manager.PersonalDetailsManager;
@@ -24,6 +27,7 @@ public class PersonalDetailsActivity extends AppCompatActivity {
     private TextView bmiStatusText;
     private ImageButton editNameButton, editAgeButton, editHeightButton, editWeightButton, editSosButton;
     private Button saveButton;
+    private View bmiStatusIndicator;
 
     private PersonalDetailsManager detailsManager;
     private boolean isUpdated = false;
@@ -44,6 +48,7 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         editWeight = findViewById(R.id.editWeight);
         editSosContact = findViewById(R.id.sosContact);
         bmiStatusText = findViewById(R.id.bmiLabel);
+        bmiStatusIndicator = findViewById(R.id.bmiStatusIndicator);
 
         editNameButton = findViewById(R.id.editNameButton);
         editAgeButton = findViewById(R.id.editAgeButton);
@@ -51,6 +56,7 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         editWeightButton = findViewById(R.id.editWeightButton);
         editSosButton = findViewById(R.id.editSosButton);
         saveButton = findViewById(R.id.saveButton);
+        saveButton.setVisibility(View.GONE);
 
         detailsManager = new PersonalDetailsManager(this);
 
@@ -60,7 +66,18 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         genderSpinner.setAdapter(adapter);
 
         loadPersonalDetails();
+
+        // Calculate and display BMI on load if height and weight are available
+        String loadedHeight = detailsManager.getSavedData("height");
+        String loadedWeight = detailsManager.getSavedData("weight");
+        if (!loadedHeight.isEmpty() && !loadedWeight.isEmpty()) {
+            String bmiCategory = detailsManager.calculateAndSaveBMI(loadedHeight, loadedWeight);
+            bmiStatusText.setText("BMI Category: " + bmiCategory);
+            updateBmiStatusIndicatorColor(bmiCategory);
+        }
+
         setEditButtonListeners();
+        setFieldFocusListeners();
     }
 
     private void setEditButtonListeners() {
@@ -116,11 +133,6 @@ public class PersonalDetailsActivity extends AppCompatActivity {
             int position = adapter.getPosition(savedGender);
             genderSpinner.setSelection(position);
         }
-
-        String bmiCategory = detailsManager.getSavedData("bmi");
-        if (!bmiCategory.isEmpty()) {
-            bmiStatusText.setText("BMI: " + bmiCategory);
-        }
     }
 
     private void showSaveButton() {
@@ -132,10 +144,71 @@ public class PersonalDetailsActivity extends AppCompatActivity {
     }
 
     public void onSaveClicked(View view) {
+        hideKeyboardAndClearFocus();
+        if (!validateFields()) {
+            return;
+        }
         saveAndUpdatePersonalDetails();
         isUpdated = false;
         saveButton.setVisibility(View.GONE);
-        genderSpinner.setEnabled(false);
+        // genderSpinner.setEnabled(false);
+    }
+
+    private boolean validateFields() {
+        String name = editName.getText().toString().trim();
+        String ageStr = editAge.getText().toString().trim();
+        String heightStr = editHeight.getText().toString().trim();
+        String weightStr = editWeight.getText().toString().trim();
+        String sos = editSosContact.getText().toString().trim();
+
+        if (!name.isEmpty() && !name.matches("[a-zA-Z ]+")) {
+            Toast.makeText(this, "Please enter a valid name (letters and spaces only)", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!ageStr.isEmpty()) {
+            int age;
+            try {
+                age = Integer.parseInt(ageStr);
+                if (age < 0 || age > 150) {
+                    Toast.makeText(this, "Please enter a valid age", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Please enter a valid age", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        if (!heightStr.isEmpty()) {
+            float height;
+            try {
+                height = Float.parseFloat(heightStr);
+                if (height <= 0) {
+                    Toast.makeText(this, "Height must be a positive value", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Please enter a valid height", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        if (!weightStr.isEmpty()) {
+            float weight;
+            try {
+                weight = Float.parseFloat(weightStr);
+                if (weight <= 0) {
+                    Toast.makeText(this, "Weight must be a positive value", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Please enter a valid weight", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        if (!sos.isEmpty() && !sos.matches("\\d{10}")) {
+            Toast.makeText(this, "SOS contact must be a 10-digit mobile number", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     private void saveAndUpdatePersonalDetails() {
@@ -155,7 +228,58 @@ public class PersonalDetailsActivity extends AppCompatActivity {
             );
 
             bmiStatusText.setText("BMI Category: " + bmiCategory);
+            updateBmiStatusIndicatorColor(bmiCategory);
             Toast.makeText(this, "Personal details saved!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateBmiStatusIndicatorColor(String bmiCategory) {
+        int colorResourceId;
+        switch (bmiCategory) {
+            case "Underweight":
+                colorResourceId = R.color.bmi_underweight;
+                break;
+            case "Normal weight":
+                colorResourceId = R.color.bmi_normal;
+                break;
+            case "Overweight":
+                colorResourceId = R.color.bmi_overweight;
+                break;
+            case "Obesity":
+                colorResourceId = R.color.bmi_obesity;
+                break;
+            default:
+                colorResourceId = android.R.color.transparent; // Default or error color
+                break;
+        }
+        int color = ContextCompat.getColor(this, colorResourceId);
+        bmiStatusIndicator.setBackgroundTintList(ColorStateList.valueOf(color));
+    }
+
+    private void setFieldFocusListeners() {
+        View.OnFocusChangeListener focusChangeListener = (v, hasFocus) -> {
+            if (!hasFocus) {
+                isUpdated = true;
+                showSaveButton();
+            }
+        };
+
+        editName.setOnFocusChangeListener(focusChangeListener);
+        editAge.setOnFocusChangeListener(focusChangeListener);
+        editHeight.setOnFocusChangeListener(focusChangeListener);
+        editWeight.setOnFocusChangeListener(focusChangeListener);
+        editSosContact.setOnFocusChangeListener(focusChangeListener);
+    }
+
+    private void hideKeyboardAndClearFocus() {
+        View[] fields = {editName, editAge, editHeight, editWeight, editSosContact};
+        for (View field : fields) {
+            field.clearFocus();
+        }
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 }
