@@ -15,4 +15,10 @@
     <color name="G100">#FFFFFF</color>
     <color name="G150">#F2F2F2</color>
     <color name="G900">#050A12</color>
+
+    <!-- BMI Status Colors -->
+    <color name="bmi_underweight">#FFFF00</color> <!-- Yellow -->
+    <color name="bmi_normal">#00FF00</color> <!-- Green -->
+    <color name="bmi_overweight">#FFA500</color> <!-- Orange -->
+    <color name="bmi_obesity">#FF0000</color> <!-- Red -->
 </resources>
