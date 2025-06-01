@@ -34,6 +34,8 @@ public class DistanceCounter implements SensorObserver {
     private float lastZ = 0;
     private boolean wasFalling = false;
 
+    private boolean isPaused = false;
+
     public DistanceCounter(Context context) {
         this.context = context;
         this.repository = SensorRepository.getInstance();
@@ -71,8 +73,22 @@ public class DistanceCounter implements SensorObserver {
         estimatedSteps = 0;
     }
 
+    public void pause() {
+        isPaused = true;
+        if (stepSensor != null) stepSensor.unregister();
+        if (accelerometerSensor != null) accelerometerSensor.unregister();
+    }
+
+    public void resume() {
+        isPaused = false;
+        if (stepSensor != null) stepSensor.register();
+        if (accelerometerSensor != null) accelerometerSensor.register();
+    }
+
     @Override
     public void onSensorChanged(int sensorType) {
+        if (isPaused) return;
+
         if (sensorType == Sensor.TYPE_STEP_COUNTER) {
             int totalSteps = (int) ((XFloatSensor) stepSensor).getX();
             if (initialSteps == -1) initialSteps = totalSteps;

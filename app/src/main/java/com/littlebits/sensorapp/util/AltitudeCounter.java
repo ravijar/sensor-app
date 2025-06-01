@@ -30,12 +30,16 @@ public class AltitudeCounter implements SensorObserver {
     private float lastAltitude = -1f;
     private float cumulativeAltitudeGain = 0f;
     private AltitudeListener listener;
+    private boolean isPaused = false;
+    private boolean usingPressure = false;
 
     private final LocationListener gpsListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            float gpsAltitude = (float) location.getAltitude();
-            processAltitude(gpsAltitude);
+            if (!isPaused) {
+                float gpsAltitude = (float) location.getAltitude();
+                processAltitude(gpsAltitude);
+            }
         }
     };
 
@@ -51,9 +55,11 @@ public class AltitudeCounter implements SensorObserver {
         this.listener = listener;
 
         if (pressureSensor != null) {
+            usingPressure = true;
             pressureSensor.addObserver(this);
             pressureSensor.register();
         } else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            usingPressure = false;
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
         } else {
             if (listener != null) listener.onAltitudeChanged(-1);
@@ -68,8 +74,28 @@ public class AltitudeCounter implements SensorObserver {
         locationManager.removeUpdates(gpsListener);
     }
 
+    public void pause() {
+        isPaused = true;
+        if (usingPressure && pressureSensor != null) {
+            pressureSensor.unregister();
+        } else {
+            locationManager.removeUpdates(gpsListener);
+        }
+    }
+
+    public void resume() {
+        isPaused = false;
+        if (usingPressure && pressureSensor != null) {
+            pressureSensor.register();
+        } else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
+        }
+    }
+
     @Override
     public void onSensorChanged(int sensorType) {
+        if (isPaused) return;
+
         if (sensorType == Sensor.TYPE_PRESSURE) {
             float pressure = ((XFloatSensor) pressureSensor).getX(); // in hPa
             float estimatedAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure);
@@ -80,7 +106,7 @@ public class AltitudeCounter implements SensorObserver {
     private void processAltitude(float currentAltitude) {
         if (lastAltitude > 0) {
             float delta = currentAltitude - lastAltitude;
-            if (delta > 0.3f) { // filter noise, only consider meaningful gains
+            if (delta > 0.3f) { // filter noise
                 cumulativeAltitudeGain += delta;
                 if (listener != null) {
                     listener.onAltitudeChanged(cumulativeAltitudeGain);

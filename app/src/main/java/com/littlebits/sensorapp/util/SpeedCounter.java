@@ -33,6 +33,7 @@ public class SpeedCounter implements SensorObserver {
 
     private boolean gpsWorking = false;
     private boolean sensorsWorking = false;
+    private boolean isPaused = false;
 
     private long lastSensorTime = 0;
     private final double[] velocityEstimate = {0.0, 0.0, 0.0};
@@ -46,7 +47,7 @@ public class SpeedCounter implements SensorObserver {
         @Override
         public void onLocationChanged(Location location) {
             gpsWorking = true;
-            if (lastLocation != null) {
+            if (lastLocation != null && !isPaused) {
                 float speed = location.getSpeed(); // m/s
                 velocity = speed * 3.6;
                 if (listener != null) listener.onSpeedChanged(velocity);
@@ -94,9 +95,27 @@ public class SpeedCounter implements SensorObserver {
         }
     }
 
+    public void pause() {
+        isPaused = true;
+        if (accelSensor != null) accelSensor.unregister();
+        if (gyroSensor != null) gyroSensor.unregister();
+        locationManager.removeUpdates(gpsListener);
+    }
+
+    public void resume() {
+        isPaused = false;
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
+        }
+
+        if (accelSensor != null) accelSensor.register();
+        if (gyroSensor != null) gyroSensor.register();
+    }
+
     @Override
     public void onSensorChanged(int sensorType) {
-        if (!sensorsWorking || sensorType != Sensor.TYPE_ACCELEROMETER) return;
+        if (isPaused || !sensorsWorking || sensorType != Sensor.TYPE_ACCELEROMETER) return;
 
         XYZFloatSensor acc = (XYZFloatSensor) accelSensor;
         float[] a = new float[]{acc.getX(), acc.getY(), acc.getZ() - 9.8f};
