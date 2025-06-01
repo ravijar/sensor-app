@@ -15,7 +15,7 @@ import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
-import com.littlebits.sensorapp.util.PersonalDetailsManager;
+import com.littlebits.sensorapp.manager.PersonalDetailsManager;
 
 public class PersonalDetailsActivity extends AppCompatActivity {
 

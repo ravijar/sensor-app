@@ -1,10 +1,15 @@
-package com.littlebits.sensorapp.util;
+package com.littlebits.sensorapp.manager;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.util.AltitudeCounter;
+import com.littlebits.sensorapp.util.DistanceCounter;
+import com.littlebits.sensorapp.util.SpeedCounter;
+import com.littlebits.sensorapp.util.StepsCounter;
+import com.littlebits.sensorapp.util.WorkoutTimer;
 
 public class WorkoutManager implements WorkoutTimer.TimerListener {
 
