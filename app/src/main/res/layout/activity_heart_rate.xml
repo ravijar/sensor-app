@@ -20,17 +20,29 @@
         android:src="@drawable/ic_back"
         android:onClick="onBackClicked" />
 
-    <!-- Animation -->
-    <ImageView
-        android:id="@+id/heartRateMonitor"
-        android:layout_width="match_parent"
-        android:layout_height="579dp"
+    <!-- Camera Preview -->
+    <SurfaceView
+        android:id="@+id/heartRateCameraSurface"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/heart_rate_monitor" />
+        android:layout_below="@id/backButton"
+        android:layout_marginTop="50dp"
+        android:visibility="visible" />
 
-    <!-- Heart Rate Measurement -->
+    <!-- Status/Error Message -->
+    <TextView
+        android:id="@+id/heartRateStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heartRateCameraSurface"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Initializing..."
+        android:textColor="@android:color/darker_gray"
+        android:textSize="18sp" />
+
+    <!-- BPM Display -->
     <TextView
         android:id="@+id/heartRateValue"
         android:layout_width="wrap_content"
@@ -38,10 +50,10 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@id/heartRateMonitorDoneButton"
         android:layout_marginBottom="50dp"
-        android:text="Measuring..."
+        android:text="0 BPM"
         android:textSize="38sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black" />
 
     <!-- Done Button -->
     <Button
@@ -57,12 +69,5 @@
         android:textColor="@color/G150"
         android:textSize="24sp"
         android:onClick="onDoneClicked" />
-
-    <!-- Hidden SurfaceView for camera-based heart rate measurement -->
-    <SurfaceView
-        android:id="@+id/heartRateCameraSurface"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone" />
 
 </RelativeLayout>

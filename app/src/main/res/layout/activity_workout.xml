@@ -102,9 +102,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/stepCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@color/black"/>
 
@@ -169,9 +170,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/distanceText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="200"
+                    android:text="0.00"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
@@ -236,9 +238,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/speedText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
@@ -303,9 +306,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/altitudeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+20"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@color/black"/>
 

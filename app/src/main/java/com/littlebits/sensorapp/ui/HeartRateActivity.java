@@ -18,25 +18,27 @@ import com.littlebits.sensorapp.util.HeartRateManager;
 public class HeartRateActivity extends AppCompatActivity {
 
     private TextView heartRateValue;
+    private TextView heartRateStatusText;
     private SurfaceView heartRateCameraSurface;
     private HeartRateManager heartRateManager;
     private Handler handler = new Handler();
     private static final int REQUEST_CAMERA_PERMISSION = 1001;
+
+    private boolean isAnimating = false;
+    private Runnable bpmAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_heart_rate);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
 
         heartRateValue = findViewById(R.id.heartRateValue);
+        heartRateStatusText = findViewById(R.id.heartRateStatusText);
         heartRateCameraSurface = findViewById(R.id.heartRateCameraSurface);
         heartRateManager = new HeartRateManager(this);
 
-        // Request camera permission if not granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -54,23 +56,68 @@ public class HeartRateActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 handler.postDelayed(this::startHeartRateMeasurement, 2000);
             } else {
-                heartRateValue.setText("Camera permission is required for heart rate measurement.");
+                heartRateValue.setText("–");
+                heartRateStatusText.setText("Camera permission is required.");
             }
         }
     }
 
     private void startHeartRateMeasurement() {
         heartRateValue.setText("Measuring...");
+        heartRateStatusText.setText("Place your finger over the camera.");
+        startBpmAnimation();
+
         heartRateManager.measureHeartRate(new HeartRateManager.HeartRateListener() {
             @Override
             public void onHeartRateMeasured(int heartRate) {
-                runOnUiThread(() -> heartRateValue.setText(heartRate + " BPM"));
+                stopBpmAnimation();
+                runOnUiThread(() -> {
+                    heartRateValue.setText(heartRate + " BPM");
+                    heartRateStatusText.setText("Measurement complete.");
+                });
             }
+
             @Override
             public void onError(String error) {
-                runOnUiThread(() -> heartRateValue.setText("Error: " + error));
+                stopBpmAnimation();
+                runOnUiThread(() -> {
+                    heartRateValue.setText("–");
+                    heartRateStatusText.setText("Error: " + error);
+                });
             }
         }, heartRateCameraSurface);
+    }
+
+    private void startBpmAnimation() {
+        isAnimating = true;
+        final int minBPM = 40;
+        final int maxBPM = 180;
+        final int step = 10;
+        final int delay = 50; // ms
+
+        handler.post(bpmAnimator = new Runnable() {
+            int bpm = minBPM;
+            boolean increasing = true;
+
+            @Override
+            public void run() {
+                if (!isAnimating) return;
+
+                heartRateValue.setText(bpm + " BPM");
+                bpm += increasing ? step : -step;
+                if (bpm >= maxBPM) increasing = false;
+                if (bpm <= minBPM) increasing = true;
+
+                handler.postDelayed(this, delay);
+            }
+        });
+    }
+
+    private void stopBpmAnimation() {
+        isAnimating = false;
+        if (bpmAnimator != null) {
+            handler.removeCallbacks(bpmAnimator);
+        }
     }
 
     @Override
@@ -79,6 +126,7 @@ public class HeartRateActivity extends AppCompatActivity {
         if (heartRateManager != null) {
             heartRateManager.stopMeasurement();
         }
+        stopBpmAnimation();
     }
 
     public void onBackClicked(View view) {
