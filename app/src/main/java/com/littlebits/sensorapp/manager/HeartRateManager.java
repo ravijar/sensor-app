@@ -1,4 +1,4 @@
-package com.littlebits.sensorapp.util;
+package com.littlebits.sensorapp.manager;
 
 import android.Manifest;
 import android.content.Context;

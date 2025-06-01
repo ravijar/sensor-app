@@ -122,7 +122,7 @@
                     android:id="@+id/stepsCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@color/black"/>
 
@@ -190,7 +190,7 @@
                     android:id="@+id/distanceCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="200"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
@@ -258,7 +258,7 @@
                     android:id="@+id/speedCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
@@ -326,7 +326,7 @@
                     android:id="@+id/altitudeCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+20"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@color/black"/>
 
@@ -394,14 +394,14 @@
                     android:id="@+id/caloriesCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="18"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="g"
+                    android:text="kcal"
                     android:textSize="16sp"
                     android:textColor="@android:color/white"
                     android:layout_marginStart="5dp"/>
@@ -420,7 +420,8 @@
             android:textSize="20sp"
             android:background="@drawable/card_background"
             android:backgroundTint="@color/S3"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:onClick="onDoneClicked"/>
 
     </GridLayout>
 
