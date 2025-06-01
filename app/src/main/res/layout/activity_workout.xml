@@ -374,16 +374,17 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/calorieText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="18"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="g"
+                    android:text="kcal"
                     android:textSize="16sp"
                     android:textColor="@android:color/white"
                     android:layout_marginStart="5dp"/>

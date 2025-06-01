@@ -15,6 +15,7 @@ public class WorkoutActivity extends AppCompatActivity {
     private TextView distanceTextView;
     private TextView speedTextView;
     private TextView altitudeTextView;
+    private TextView calorieTextView;
     private Button endWorkoutButton;
     private ImageView pauseButton;
 
@@ -32,6 +33,7 @@ public class WorkoutActivity extends AppCompatActivity {
         distanceTextView = findViewById(R.id.distanceText);
         speedTextView = findViewById(R.id.speedText);
         altitudeTextView = findViewById(R.id.altitudeText);
+        calorieTextView = findViewById(R.id.calorieText);
         endWorkoutButton = findViewById(R.id.endWorkoutButton);
         pauseButton = findViewById(R.id.pauseButton);
 
@@ -42,6 +44,7 @@ public class WorkoutActivity extends AppCompatActivity {
                 distanceTextView,
                 speedTextView,
                 altitudeTextView,
+                calorieTextView,
                 pauseButton
         );
 

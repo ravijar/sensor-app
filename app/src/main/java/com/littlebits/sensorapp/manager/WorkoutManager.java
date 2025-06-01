@@ -7,16 +7,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.model.ActivityLabel;
 import com.littlebits.sensorapp.repository.SensorRepository;
 import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
+import com.littlebits.sensorapp.util.ActivityClassifier;
 import com.littlebits.sensorapp.util.AltitudeCounter;
+import com.littlebits.sensorapp.util.CalorieCounter;
 import com.littlebits.sensorapp.util.DistanceCounter;
 import com.littlebits.sensorapp.util.SpeedCounter;
 import com.littlebits.sensorapp.util.StepsCounter;
 import com.littlebits.sensorapp.util.WorkoutTimer;
-import com.littlebits.sensorapp.util.ActivityClassifier;
-import com.littlebits.sensorapp.model.ActivityLabel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserver {
 
     private final Activity context;
-    private final TextView timerTextView, stepCountText, distanceText, speedText, altitudeText;
+    private final TextView timerTextView, stepCountText, distanceText, speedText, altitudeText, calorieText;
     private final ImageView pauseButton;
 
     private WorkoutTimer workoutTimer;
@@ -32,9 +33,10 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
     private DistanceCounter distanceCounter;
     private SpeedCounter speedCounter;
     private AltitudeCounter altitudeCounter;
-
+    private CalorieCounter calorieCounter;
     private ActivityClassifier classifier;
-    private ActivityLabel currentActivity;
+
+    private ActivityLabel currentActivity = ActivityLabel.SITTING;
 
     private XYZFloatSensor accelerometer, gyroscope, linearAcceleration;
     private final List<Float> ax = new ArrayList<>(), ay = new ArrayList<>(), az = new ArrayList<>();
@@ -48,6 +50,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
                           TextView distanceText,
                           TextView speedText,
                           TextView altitudeText,
+                          TextView calorieText,
                           ImageView pauseButton) {
         this.context = context;
         this.timerTextView = timerText;
@@ -55,6 +58,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         this.distanceText = distanceText;
         this.speedText = speedText;
         this.altitudeText = altitudeText;
+        this.calorieText = calorieText;
         this.pauseButton = pauseButton;
     }
 
@@ -87,6 +91,11 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         altitudeCounter = new AltitudeCounter(context);
         altitudeCounter.start(altitude -> context.runOnUiThread(() ->
                 altitudeText.setText(String.format("%.1f", altitude))
+        ));
+
+        calorieCounter = new CalorieCounter();
+        calorieCounter.start(total -> context.runOnUiThread(() ->
+                calorieText.setText(String.format("%.1f", total))
         ));
 
         classifier = new ActivityClassifier(context);
@@ -124,30 +133,38 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
     }
 
     private void predictActivity() {
-        if (ax.size() >= TIME_STAMP && ay.size() >= TIME_STAMP && az.size() >= TIME_STAMP &&
-                gx.size() >= TIME_STAMP && gy.size() >= TIME_STAMP && gz.size() >= TIME_STAMP &&
-                lx.size() >= TIME_STAMP && ly.size() >= TIME_STAMP && lz.size() >= TIME_STAMP) {
-
-            List<Float> data = new ArrayList<>();
-            for (int i = 0; i < TIME_STAMP; i++) {
-                data.add(ax.get(i)); data.add(ay.get(i)); data.add(az.get(i));
-                data.add(gx.get(i)); data.add(gy.get(i)); data.add(gz.get(i));
-                data.add(lx.get(i)); data.add(ly.get(i)); data.add(lz.get(i));
-            }
-
-            float[] input = new float[data.size()];
-            for (int i = 0; i < data.size(); i++) input[i] = data.get(i);
-
-            currentActivity = classifier.getTopPrediction(input);
-
-            ax.clear(); ay.clear(); az.clear();
-            gx.clear(); gy.clear(); gz.clear();
-            lx.clear(); ly.clear(); lz.clear();
+        if (ax.size() < TIME_STAMP || ay.size() < TIME_STAMP || az.size() < TIME_STAMP ||
+                gx.size() < TIME_STAMP || gy.size() < TIME_STAMP || gz.size() < TIME_STAMP ||
+                lx.size() < TIME_STAMP || ly.size() < TIME_STAMP || lz.size() < TIME_STAMP) {
+            return; // Wait until all buffers are full
         }
+
+        List<Float> data = new ArrayList<>();
+        for (int i = 0; i < TIME_STAMP; i++) {
+            data.add(ax.get(i)); data.add(ay.get(i)); data.add(az.get(i));
+            data.add(gx.get(i)); data.add(gy.get(i)); data.add(gz.get(i));
+            data.add(lx.get(i)); data.add(ly.get(i)); data.add(lz.get(i));
+        }
+
+        float[] input = new float[data.size()];
+        for (int i = 0; i < data.size(); i++) input[i] = data.get(i);
+
+        currentActivity = classifier.getTopPrediction(input);
+
+        // Notify CalorieCounter about the updated activity
+        calorieCounter.updateActivity(currentActivity);
+
+        // Clear old data
+        ax.clear(); ay.clear(); az.clear();
+        gx.clear(); gy.clear(); gz.clear();
+        lx.clear(); ly.clear(); lz.clear();
     }
 
-    public ActivityLabel getCurrentActivity() {
-        return currentActivity;
+
+    @Override
+    public void onTimeUpdate(String formattedTime) {
+        context.runOnUiThread(() -> timerTextView.setText(formattedTime));
+        calorieCounter.tick();
     }
 
     public void togglePause() {
@@ -166,6 +183,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         distanceCounter.pause();
         speedCounter.pause();
         altitudeCounter.pause();
+        calorieCounter.pause();
     }
 
     public void resume() {
@@ -174,6 +192,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         distanceCounter.resume();
         speedCounter.resume();
         altitudeCounter.resume();
+        calorieCounter.resume();
     }
 
     public void stopAll() {
@@ -182,16 +201,12 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         distanceCounter.stop();
         speedCounter.stop();
         altitudeCounter.stop();
+        calorieCounter.stop();
     }
 
     public void saveState(Bundle outState) {
         outState.putInt("seconds", workoutTimer.getSeconds());
         outState.putBoolean("running", workoutTimer.isRunning());
         outState.putBoolean("wasRunning", workoutTimer.wasRunning());
-    }
-
-    @Override
-    public void onTimeUpdate(String formattedTime) {
-        context.runOnUiThread(() -> timerTextView.setText(formattedTime));
     }
 }
