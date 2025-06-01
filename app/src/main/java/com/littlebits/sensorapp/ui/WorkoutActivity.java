@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.util.AltitudeCounter;
 import com.littlebits.sensorapp.util.DistanceCounter;
 import com.littlebits.sensorapp.util.SpeedCounter;
 import com.littlebits.sensorapp.util.StepsCounter;
@@ -19,6 +20,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private TextView stepCountTextView;
     private TextView distanceTextView;
     private TextView speedTextView;
+    private TextView altitudeTextView;
 
     private Button endWorkoutButton;
     private ImageView pauseButton;
@@ -27,6 +29,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private StepsCounter stepsCounter;
     private DistanceCounter distanceCounter;
     private SpeedCounter speedCounter;
+    private AltitudeCounter altitudeCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         stepCountTextView = findViewById(R.id.stepCountText);
         distanceTextView = findViewById(R.id.distanceText);
         speedTextView = findViewById(R.id.speedText);
+        altitudeTextView = findViewById(R.id.altitudeText);
 
         endWorkoutButton = findViewById(R.id.endWorkoutButton);
         pauseButton = findViewById(R.id.pauseButton);
@@ -73,11 +77,19 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
             }
         });
 
-        // Speed Counter
+        // Speed counter
         speedCounter = new SpeedCounter(this);
         speedCounter.start(speedKmph -> {
             if (speedKmph >= 0 && speedTextView != null) {
                 runOnUiThread(() -> speedTextView.setText(String.format("%.1f", speedKmph)));
+            }
+        });
+
+        // Altitude counter 👇
+        altitudeCounter = new AltitudeCounter(this);
+        altitudeCounter.start(altitudeMeters -> {
+            if (altitudeTextView != null) {
+                runOnUiThread(() -> altitudeTextView.setText(String.format("%.1f", altitudeMeters)));
             }
         });
 
@@ -101,6 +113,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         if (stepsCounter != null) stepsCounter.stop();
         if (distanceCounter != null) distanceCounter.stop();
         if (speedCounter != null) speedCounter.stop();
+        if (altitudeCounter != null) altitudeCounter.stop();
         finish();
     }
 
@@ -137,6 +150,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         if (stepsCounter != null) stepsCounter.stop();
         if (distanceCounter != null) distanceCounter.stop();
         if (speedCounter != null) speedCounter.stop();
+        if (altitudeCounter != null) altitudeCounter.stop();
         super.onBackPressed();
     }
 }
