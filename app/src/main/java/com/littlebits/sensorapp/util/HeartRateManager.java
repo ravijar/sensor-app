@@ -4,10 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
@@ -26,22 +22,27 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.littlebits.sensorapp.repository.SensorRepository;
+import com.littlebits.sensorapp.sensor.BaseSensor;
+import com.littlebits.sensorapp.sensor.HeartRate;
+import com.littlebits.sensorapp.sensor.SensorObserver;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HeartRateManager {
+public class HeartRateManager implements SensorObserver {
+
     public interface HeartRateListener {
         void onHeartRateMeasured(int heartRate);
         void onError(String error);
     }
 
     private final Context context;
-    private final SensorManager sensorManager;
     private final CameraManager cameraManager;
-    private Sensor heartRateSensor;
     private HeartRateListener listener;
-    private SensorEventListener sensorEventListener;
+
+    private BaseSensor heartRateSensor;
 
     // Camera variables
     private CameraDevice cameraDevice;
@@ -62,11 +63,11 @@ public class HeartRateManager {
 
     public HeartRateManager(Context context) {
         this.context = context;
-        this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         this.cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-        if (sensorManager != null) {
-            heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-        }
+
+        SensorRepository repository = SensorRepository.getInstance();
+        repository.initializeSensors((android.hardware.SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
+        heartRateSensor = repository.getSensor(android.hardware.Sensor.TYPE_HEART_RATE);
     }
 
     public boolean hasHeartRateSensor() {
@@ -76,6 +77,7 @@ public class HeartRateManager {
     public void measureHeartRate(HeartRateListener listener, SurfaceView surfaceView) {
         this.listener = listener;
         this.surfaceView = surfaceView;
+
         if (hasHeartRateSensor()) {
             startSensorMeasurement();
         } else {
@@ -84,19 +86,24 @@ public class HeartRateManager {
     }
 
     private void startSensorMeasurement() {
-        sensorEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
-                    int heartRate = Math.round(event.values[0]);
-                    if (listener != null) listener.onHeartRateMeasured(heartRate);
-                    sensorManager.unregisterListener(this);
-                }
-            }
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-        };
-        sensorManager.registerListener(sensorEventListener, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (heartRateSensor == null) {
+            if (listener != null) listener.onError("Heart rate sensor not available");
+            return;
+        }
+
+        heartRateSensor.addObserver(this);
+        heartRateSensor.register();
+    }
+
+    @Override
+    public void onSensorChanged(int sensorType) {
+        if (heartRateSensor != null && sensorType == android.hardware.Sensor.TYPE_HEART_RATE) {
+            float x = ((HeartRate) heartRateSensor).getX();
+            int bpm = Math.round(x);
+            if (listener != null) listener.onHeartRateMeasured(bpm);
+            heartRateSensor.unregister();
+            heartRateSensor.removeObserver(this);
+        }
     }
 
     private void startCameraMeasurement() {
@@ -104,8 +111,10 @@ public class HeartRateManager {
             if (listener != null) listener.onError("Camera permission not granted");
             return;
         }
+
         measuringWithCamera = true;
         startBackgroundThread();
+
         try {
             String cameraId = cameraManager.getCameraIdList()[0];
             cameraManager.openCamera(cameraId, new CameraDevice.StateCallback() {
@@ -114,11 +123,13 @@ public class HeartRateManager {
                     cameraDevice = camera;
                     createCameraPreviewSession();
                 }
+
                 @Override
                 public void onDisconnected(@NonNull CameraDevice camera) {
                     camera.close();
                     cameraDevice = null;
                 }
+
                 @Override
                 public void onError(@NonNull CameraDevice camera, int error) {
                     camera.close();
@@ -137,6 +148,7 @@ public class HeartRateManager {
             Surface surface = holder.getSurface();
             int width = surfaceView.getWidth() > 0 ? surfaceView.getWidth() : 640;
             int height = surfaceView.getHeight() > 0 ? surfaceView.getHeight() : 480;
+
             imageReader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 2);
             imageReader.setOnImageAvailableListener(reader -> {
                 Image image = null;
@@ -175,6 +187,7 @@ public class HeartRateManager {
                         if (listener != null) listener.onError("Camera session error: " + e.getMessage());
                     }
                 }
+
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession session) {
                     if (listener != null) listener.onError("Camera session configuration failed");
@@ -283,16 +296,16 @@ public class HeartRateManager {
         // Calculate average BPM
         long avgInterval = validIntervals.stream().reduce(0L, Long::sum) / validIntervals.size();
         int heartRate = (int) (60000 / avgInterval);
-
-        // Clamp to realistic range
         heartRate = Math.max(40, Math.min(heartRate, 200));
+
         if (listener != null) listener.onHeartRateMeasured(heartRate);
         stopCameraMeasurement();
     }
 
     public void stopMeasurement() {
-        if (hasHeartRateSensor() && sensorEventListener != null) {
-            sensorManager.unregisterListener(sensorEventListener);
+        if (heartRateSensor != null) {
+            heartRateSensor.unregister();
+            heartRateSensor.removeObserver(this);
         }
         if (measuringWithCamera) {
             stopCameraMeasurement();
