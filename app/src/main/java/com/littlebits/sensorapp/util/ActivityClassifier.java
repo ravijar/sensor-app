@@ -3,6 +3,8 @@ package com.littlebits.sensorapp.util;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 
+import com.littlebits.sensorapp.model.ActivityLabel;
+
 import org.tensorflow.lite.Interpreter;
 
 import java.io.FileInputStream;
@@ -40,7 +42,6 @@ public class ActivityClassifier {
         float[][][] input = new float[1][INPUT_LENGTH][INPUT_WIDTH];
         float[][] output = new float[1][OUTPUT_SIZE];
 
-        // Reshape flat input to [1][100][9]
         for (int i = 0; i < INPUT_LENGTH; i++) {
             for (int j = 0; j < INPUT_WIDTH; j++) {
                 input[0][i][j] = inputDataFlat[i * INPUT_WIDTH + j];
@@ -49,5 +50,22 @@ public class ActivityClassifier {
 
         interpreter.run(input, output);
         return output[0];
+    }
+
+    public String predictActivityLabel(float[] inputDataFlat) {
+        return getTopPrediction(inputDataFlat).getLabel();
+    }
+
+    public ActivityLabel getTopPrediction(float[] inputDataFlat) {
+        float[] probabilities = predictProbabilities(inputDataFlat);
+        int maxIndex = 0;
+        float maxProb = probabilities[0];
+        for (int i = 1; i < probabilities.length; i++) {
+            if (probabilities[i] > maxProb) {
+                maxProb = probabilities[i];
+                maxIndex = i;
+            }
+        }
+        return ActivityLabel.fromIndex(maxIndex);
     }
 }

@@ -14,7 +14,6 @@ import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
 import com.littlebits.sensorapp.util.ActivityClassifier;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,22 +25,16 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
     private List<Float> ax,ay,az;
     private List<Float> gx,gy,gz;
     private List<Float> lx,ly,lz;
-    private float[] results;
+    private String result;
 
-    private TextView bikingTextView, downstairsTextView, joggingTextView, sittingTextView, standingTextView, upstairsTextView, walkingTextView;
+    private TextView activityTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bikingTextView = findViewById(R.id.biking_TextView);
-        downstairsTextView = findViewById(R.id.downstairs_TextView);
-        joggingTextView = findViewById(R.id.jogging_TextView);
-        sittingTextView = findViewById(R.id.sitting_TextView);
-        standingTextView = findViewById(R.id.standing_TextView);
-        upstairsTextView = findViewById(R.id.upstairs_TextView);
-        walkingTextView = findViewById(R.id.walking_TextView);
+        activityTextView = findViewById(R.id.activityText);
 
         ax=new ArrayList<>(); ay=new ArrayList<>(); az=new ArrayList<>();
         gx=new ArrayList<>(); gy=new ArrayList<>(); gz=new ArrayList<>();
@@ -71,27 +64,14 @@ public class MainActivity extends AppCompatActivity implements SensorObserver {
             }
 
             float[] input = toFloatArray(data);
-            results = classifier.predictProbabilities(input);
+            result = classifier.predictActivityLabel(input);
 
-            // Mapping from index to activity
-            bikingTextView.setText("Biking: " + round(results[0], 2));
-            downstairsTextView.setText("Downstairs: " + round(results[1], 2));
-            joggingTextView.setText("Jogging: " + round(results[2], 2));
-            sittingTextView.setText("Sitting: " + round(results[3], 2));
-            upstairsTextView.setText("Upstairs: " + round(results[4], 2));
-            standingTextView.setText("Standing: " + round(results[5], 2));
-            walkingTextView.setText("Walking: " + round(results[6], 2));
+            activityTextView.setText(result);
 
             ax.clear(); ay.clear(); az.clear();
             gx.clear(); gy.clear(); gz.clear();
             lx.clear(); ly.clear(); lz.clear();
         }
-    }
-
-    private float round(float value, int decimalPlaces) {
-        BigDecimal bigDecimal = new BigDecimal(Float.toString(value));
-        bigDecimal = bigDecimal.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
-        return bigDecimal.floatValue();
     }
 
     private float[] toFloatArray(List<Float> data) {
