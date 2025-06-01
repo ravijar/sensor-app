@@ -19,7 +19,7 @@ public class ActivityClassifier {
     private static final int INPUT_WIDTH = 9;    // features per step
     private static final int OUTPUT_SIZE = 7;    // 7 activity classes
 
-    private Interpreter interpreter;
+    private final Interpreter interpreter;
 
     public ActivityClassifier(Context context) {
         try {
@@ -52,12 +52,9 @@ public class ActivityClassifier {
         return output[0];
     }
 
-    public String predictActivityLabel(float[] inputDataFlat) {
-        return getTopPrediction(inputDataFlat).getLabel();
-    }
-
     public ActivityLabel getTopPrediction(float[] inputDataFlat) {
         float[] probabilities = predictProbabilities(inputDataFlat);
+
         int maxIndex = 0;
         float maxProb = probabilities[0];
         for (int i = 1; i < probabilities.length; i++) {
