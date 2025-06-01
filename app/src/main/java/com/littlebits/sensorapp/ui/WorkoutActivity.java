@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
 import com.littlebits.sensorapp.util.DistanceCounter;
+import com.littlebits.sensorapp.util.SpeedCounter;
 import com.littlebits.sensorapp.util.StepsCounter;
 import com.littlebits.sensorapp.util.WorkoutTimer;
 
@@ -17,6 +18,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private TextView timerTextView;
     private TextView stepCountTextView;
     private TextView distanceTextView;
+    private TextView speedTextView;
 
     private Button endWorkoutButton;
     private ImageView pauseButton;
@@ -24,6 +26,7 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private WorkoutTimer workoutTimer;
     private StepsCounter stepsCounter;
     private DistanceCounter distanceCounter;
+    private SpeedCounter speedCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,9 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         // UI components
         timerTextView = findViewById(R.id.timer);
         stepCountTextView = findViewById(R.id.stepCountText);
-        distanceTextView = findViewById(R.id.distanceText);  // <-- Add this ID to XML
+        distanceTextView = findViewById(R.id.distanceText);
+        speedTextView = findViewById(R.id.speedText);
+
         endWorkoutButton = findViewById(R.id.endWorkoutButton);
         pauseButton = findViewById(R.id.pauseButton);
 
@@ -68,13 +73,17 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
             }
         });
 
+        // Speed Counter
+        speedCounter = new SpeedCounter(this);
+        speedCounter.start(speedKmph -> {
+            if (speedKmph >= 0 && speedTextView != null) {
+                runOnUiThread(() -> speedTextView.setText(String.format("%.1f", speedKmph)));
+            }
+        });
+
+        // Buttons
         endWorkoutButton.setOnClickListener(v -> finishWorkout());
         pauseButton.setOnClickListener(v -> togglePause());
-    }
-
-    @Override
-    public void onTimeUpdate(String formattedTime) {
-        timerTextView.setText(formattedTime);
     }
 
     private void togglePause() {
@@ -91,14 +100,13 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         workoutTimer.stopTimer();
         if (stepsCounter != null) stepsCounter.stop();
         if (distanceCounter != null) distanceCounter.stop();
+        if (speedCounter != null) speedCounter.stop();
         finish();
     }
 
     @Override
-    public void onBackPressed() {
-        if (stepsCounter != null) stepsCounter.stop();
-        if (distanceCounter != null) distanceCounter.stop();
-        super.onBackPressed();
+    public void onTimeUpdate(String formattedTime) {
+        timerTextView.setText(formattedTime);
     }
 
     @Override
@@ -122,5 +130,13 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
         super.onPause();
         workoutTimer.setWasRunning(workoutTimer.isRunning());
         workoutTimer.pauseTimer();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (stepsCounter != null) stepsCounter.stop();
+        if (distanceCounter != null) distanceCounter.stop();
+        if (speedCounter != null) speedCounter.stop();
+        super.onBackPressed();
     }
 }
