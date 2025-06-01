@@ -170,9 +170,10 @@
                 android:gravity="bottom">
 
                 <TextView
+                    android:id="@+id/distanceText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="200"
+                    android:text="0.00"
                     android:textSize="26sp"
                     android:textColor="@android:color/white"/>
 

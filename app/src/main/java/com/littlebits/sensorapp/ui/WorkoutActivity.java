@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.littlebits.sensorapp.R;
+import com.littlebits.sensorapp.util.DistanceCounter;
 import com.littlebits.sensorapp.util.StepsCounter;
 import com.littlebits.sensorapp.util.WorkoutTimer;
 
@@ -15,12 +16,14 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
 
     private TextView timerTextView;
     private TextView stepCountTextView;
+    private TextView distanceTextView;
 
     private Button endWorkoutButton;
     private ImageView pauseButton;
 
     private WorkoutTimer workoutTimer;
     private StepsCounter stepsCounter;
+    private DistanceCounter distanceCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,15 +34,15 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
             getSupportActionBar().hide();
         }
 
-        // Initialize UI components
+        // UI components
         timerTextView = findViewById(R.id.timer);
+        stepCountTextView = findViewById(R.id.stepCountText);
+        distanceTextView = findViewById(R.id.distanceText);  // <-- Add this ID to XML
         endWorkoutButton = findViewById(R.id.endWorkoutButton);
         pauseButton = findViewById(R.id.pauseButton);
-        stepCountTextView = findViewById(R.id.stepCountText);
 
-        // Initialize WorkoutTimer
+        // Timer
         workoutTimer = new WorkoutTimer(this);
-
         if (savedInstanceState != null) {
             workoutTimer.saveState(
                     savedInstanceState.getInt("seconds"),
@@ -47,15 +50,21 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
                     savedInstanceState.getBoolean("wasRunning")
             );
         }
-
-        // Start timer
         workoutTimer.startTimer();
 
-        // Start step counter and update UI
+        // Step counter
         stepsCounter = new StepsCounter(this);
         stepsCounter.start(totalSteps -> {
             if (totalSteps >= 0 && stepCountTextView != null) {
                 runOnUiThread(() -> stepCountTextView.setText(String.valueOf(totalSteps)));
+            }
+        });
+
+        // Distance counter
+        distanceCounter = new DistanceCounter(this);
+        distanceCounter.start(distance -> {
+            if (distanceTextView != null) {
+                runOnUiThread(() -> distanceTextView.setText(String.format("%.2f", distance)));
             }
         });
 
@@ -81,12 +90,14 @@ public class WorkoutActivity extends AppCompatActivity implements WorkoutTimer.T
     private void finishWorkout() {
         workoutTimer.stopTimer();
         if (stepsCounter != null) stepsCounter.stop();
+        if (distanceCounter != null) distanceCounter.stop();
         finish();
     }
 
     @Override
     public void onBackPressed() {
         if (stepsCounter != null) stepsCounter.stop();
+        if (distanceCounter != null) distanceCounter.stop();
         super.onBackPressed();
     }
 
