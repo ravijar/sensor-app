@@ -20,9 +20,21 @@ public class CalorieCounter {
     private boolean isPaused = false;
 
     private ActivityLabel currentActivity = ActivityLabel.SITTING;
-    private final double userWeightKg = 70.0; // You can make this configurable
+
+    // Predefined user data
+    private final double userWeightKg = 70.0;
+    private final double userHeightCm = 175.0;
+    private final int userAgeYears = 30;
+    private final boolean userIsMale = true;
+
+    private final double currentBMR; // Basal Metabolic Rate kcal/day
 
     public CalorieCounter() {
+        initializeMETValues();
+        currentBMR = calculateBMR();
+    }
+
+    private void initializeMETValues() {
         metValues.put(ActivityLabel.WALKING, 3.5);
         metValues.put(ActivityLabel.JOGGING, 7.0);
         metValues.put(ActivityLabel.BIKING, 6.0);
@@ -30,6 +42,15 @@ public class CalorieCounter {
         metValues.put(ActivityLabel.STANDING, 2.0);
         metValues.put(ActivityLabel.UPSTAIRS, 5.0);
         metValues.put(ActivityLabel.DOWNSTAIRS, 4.0);
+    }
+
+    private double calculateBMR() {
+        // Mifflin-St Jeor Equation
+        if (userIsMale) {
+            return 10 * userWeightKg + 6.25 * userHeightCm - 5 * userAgeYears + 5;
+        } else {
+            return 10 * userWeightKg + 6.25 * userHeightCm - 5 * userAgeYears - 161;
+        }
     }
 
     public void start(CalorieListener listener) {
@@ -57,9 +78,11 @@ public class CalorieCounter {
 
         double durationMin = deltaMillis / 60000.0;
         double met = metValues.getOrDefault(currentActivity, 1.0);
-        double calories = (met * userWeightKg * 3.5 / 200.0) * durationMin;
 
-        totalCalories += calories;
+        double caloriesPerMinute = (currentBMR / 1440.0) * met;
+        double caloriesBurned = caloriesPerMinute * durationMin;
+
+        totalCalories += caloriesBurned;
         lastTimestamp = now;
 
         if (listener != null) {
