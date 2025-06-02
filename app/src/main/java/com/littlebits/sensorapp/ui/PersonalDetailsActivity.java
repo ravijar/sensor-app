@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
+import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -78,6 +79,7 @@ public class PersonalDetailsActivity extends AppCompatActivity {
 
         setEditButtonListeners();
         setFieldFocusListeners();
+        setGenderSpinnerListener();
     }
 
     private void setEditButtonListeners() {
@@ -281,5 +283,26 @@ public class PersonalDetailsActivity extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    private void setGenderSpinnerListener() {
+        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // Do nothing on the initial selection
+                if (parentView.getTag() != null && (boolean) parentView.getTag()) {
+                    isUpdated = true;
+                    showSaveButton();
+                } else {
+                    // Mark the spinner as initialized after the first selection
+                    parentView.setTag(true);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Do nothing
+            }
+        });
     }
 }
