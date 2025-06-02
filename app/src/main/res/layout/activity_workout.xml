@@ -17,11 +17,11 @@
         android:layout_alignParentTop="true">
 
         <ImageView
+            android:id="@+id/activity"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:background="@drawable/round_button"
             android:backgroundTint="@color/G150"
-            android:src="@drawable/ic_distance_l"
             android:scaleType="centerInside" />
 
         <TextView

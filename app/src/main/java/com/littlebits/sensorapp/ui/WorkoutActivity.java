@@ -122,6 +122,18 @@ public class WorkoutActivity extends AppCompatActivity {
         });
     }
 
+    public void setActivityIcon(String activityName) {
+        ImageView activityImage = findViewById(R.id.activity);
+
+        String resourceName = "ic_" + activityName.toLowerCase().replaceAll("\\s+", "");
+
+        int resId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
+
+        if (resId != 0) {
+            activityImage.setImageResource(resId);
+        }
+    }
+
 
     private Location getCurrentLocation() {
         return currentLocation;
