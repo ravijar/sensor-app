@@ -225,7 +225,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         workout.setSteps(stepsCounter.getCurrentStepCount());
         workout.setDistance(distanceCounter.getCurrentDistance());
         workout.setSpeed(speedCounter.getAverageSpeed());
-        workout.setAltitude(altitudeCounter.getCumulativeAltitudeGain());
+        workout.setAltitude(altitudeCounter.getFusedAltitude());
         workout.setCalories(calorieCounter.getTotalCalories());
 
         return workout;

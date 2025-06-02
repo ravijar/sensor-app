@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+ import android.os.SystemClock;
 
 import androidx.core.app.ActivityCompat;
 
@@ -19,7 +20,7 @@ import com.littlebits.sensorapp.sensor.XFloatSensor;
 public class AltitudeCounter implements SensorObserver {
 
     public interface AltitudeListener {
-        void onAltitudeChanged(double cumulativeGain);
+        void onAltitudeChanged(double altitudeMeters);
     }
 
     private final Context context;
@@ -27,18 +28,26 @@ public class AltitudeCounter implements SensorObserver {
     private final SensorRepository repository;
     private final BaseSensor pressureSensor;
 
-    private float lastAltitude = -1f;
-    private float cumulativeAltitudeGain = 0f;
     private AltitudeListener listener;
     private boolean isPaused = false;
     private boolean usingPressure = false;
+
+    private float lastPressureAltitude = -1f;
+    private float lastGpsAltitude = -1f;
+    private float fusedAltitude = -1f;
+
+    private long lastUpdateTime = 0;
+
+    // Complementary filter parameter (tune alpha between 0 and 1)
+    private static final float ALPHA = 0.02f;
 
     private final LocationListener gpsListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             if (!isPaused) {
                 float gpsAltitude = (float) location.getAltitude();
-                processAltitude(gpsAltitude);
+                lastGpsAltitude = gpsAltitude;
+                fuseAltitude();
             }
         }
     };
@@ -58,11 +67,14 @@ public class AltitudeCounter implements SensorObserver {
             usingPressure = true;
             pressureSensor.addObserver(this);
             pressureSensor.register();
-        } else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            usingPressure = false;
+        }
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
-        } else {
-            if (listener != null) listener.onAltitudeChanged(-1);
+        }
+
+        if (!usingPressure && listener != null) {
+            // No pressure sensor, will rely on GPS only
         }
     }
 
@@ -78,16 +90,16 @@ public class AltitudeCounter implements SensorObserver {
         isPaused = true;
         if (usingPressure && pressureSensor != null) {
             pressureSensor.unregister();
-        } else {
-            locationManager.removeUpdates(gpsListener);
         }
+        locationManager.removeUpdates(gpsListener);
     }
 
     public void resume() {
         isPaused = false;
         if (usingPressure && pressureSensor != null) {
             pressureSensor.register();
-        } else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        }
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsListener);
         }
     }
@@ -98,25 +110,48 @@ public class AltitudeCounter implements SensorObserver {
 
         if (sensorType == Sensor.TYPE_PRESSURE) {
             float pressure = ((XFloatSensor) pressureSensor).getX(); // in hPa
-            float estimatedAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure);
-            processAltitude(estimatedAltitude);
+            lastPressureAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure);
+            fuseAltitude();
         }
     }
 
-    private void processAltitude(float currentAltitude) {
-        if (lastAltitude > 0) {
-            float delta = currentAltitude - lastAltitude;
-            if (delta > 0.3f) { // filter noise
-                cumulativeAltitudeGain += delta;
-                if (listener != null) {
-                    listener.onAltitudeChanged(cumulativeAltitudeGain);
-                }
+    private void fuseAltitude() {
+        if (lastPressureAltitude < 0 && lastGpsAltitude < 0) {
+            return; // no data yet
+        }
+
+        long now = SystemClock.elapsedRealtime();
+        if (lastUpdateTime == 0) {
+            // Initialize fused altitude
+            if (lastPressureAltitude >= 0 && lastGpsAltitude >= 0) {
+                fusedAltitude = (lastPressureAltitude + lastGpsAltitude) / 2f;
+            } else if (lastPressureAltitude >= 0) {
+                fusedAltitude = lastPressureAltitude;
+            } else {
+                fusedAltitude = lastGpsAltitude;
+            }
+        } else {
+            float dt = (now - lastUpdateTime) / 1000f;
+
+            // Complementary filter fusion
+            // Barometer is good for short-term changes, GPS good for long-term stability
+            if (lastPressureAltitude >= 0 && lastGpsAltitude >= 0) {
+                fusedAltitude = ALPHA * lastGpsAltitude + (1 - ALPHA) * (fusedAltitude + (lastPressureAltitude - fusedAltitude));
+            } else if (lastPressureAltitude >= 0) {
+                fusedAltitude = lastPressureAltitude;
+            } else if (lastGpsAltitude >= 0) {
+                fusedAltitude = lastGpsAltitude;
             }
         }
-        lastAltitude = currentAltitude;
+
+        lastUpdateTime = now;
+
+        if (listener != null) {
+            listener.onAltitudeChanged(fusedAltitude);
+        }
     }
 
-    public float getCumulativeAltitudeGain() {
-        return cumulativeAltitudeGain;
+    public float getFusedAltitude() {
+        return fusedAltitude;
     }
 }
