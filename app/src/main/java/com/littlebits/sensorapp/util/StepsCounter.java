@@ -10,6 +10,10 @@ import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XFloatSensor;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class StepsCounter implements SensorObserver {
 
     public interface StepListener {
@@ -27,16 +31,22 @@ public class StepsCounter implements SensorObserver {
     private int fallbackStepCount = 0;
     private int currentStepCount = 0;
 
-    private float lastAccelZ = 0;
-    private float lastGyroZ = 0;
-    private boolean accelRising = false;
-    private long lastStepTime = 0;
-
     private boolean isPaused = false;
 
-    private static final float ACCEL_THRESHOLD = 1.8f; // m/s^2
-    private static final float GYRO_THRESHOLD = 1.2f; // rad/s
-    private static final int STEP_INTERVAL_MS = 350; // Minimum delay between steps
+    private static final float ACCEL_UPPER_THRESHOLD = 11.0f; // m/s^2 (~1.8g)
+    private static final float ACCEL_LOWER_THRESHOLD = 9.0f;  // m/s^2 (~1g gravity)
+    private static final float GYRO_THRESHOLD = 1.2f;         // rad/s
+    private static final int STEP_INTERVAL_MS = 350;          // Minimum delay between steps
+
+    // For median filter
+    private final Queue<Float> accelBuffer = new LinkedList<>();
+    private static final int FILTER_WINDOW_SIZE = 5;
+
+    // State variables for step detection
+    private boolean accelRising = false;
+    private float lastFilteredAccel = 9.8f; // gravity approx
+    private float lastGyroMagnitude = 0;
+    private long lastStepTime = 0;
 
     public StepsCounter(Context context) {
         this.repository = SensorRepository.getInstance();
@@ -114,13 +124,18 @@ public class StepsCounter implements SensorObserver {
         }
 
         else if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-            float z = ((XYZFloatSensor) accelSensor).getZ();
-            boolean isRising = z > lastAccelZ;
+            XYZFloatSensor a = (XYZFloatSensor) accelSensor;
 
-            // Detect peak
-            if (!isRising && accelRising && (lastAccelZ > ACCEL_THRESHOLD)) {
-                // Wait for gyro confirmation
-                if (lastGyroZ > GYRO_THRESHOLD && (currentTime - lastStepTime > STEP_INTERVAL_MS)) {
+            // Compute resultant acceleration magnitude
+            float accMag = computeResultant(a.getX(), a.getY(), a.getZ());
+            float filteredAcc = applyMedianFilter(accMag);
+
+            boolean isRisingNow = filteredAcc > lastFilteredAccel;
+
+            // Detect peak: acceleration crosses upper threshold going down
+            if (!isRisingNow && accelRising && (lastFilteredAccel > ACCEL_UPPER_THRESHOLD)) {
+                // Confirm step with gyro magnitude and step interval
+                if (lastGyroMagnitude > GYRO_THRESHOLD && (currentTime - lastStepTime > STEP_INTERVAL_MS)) {
                     fallbackStepCount++;
                     lastStepTime = currentTime;
                     currentStepCount = fallbackStepCount;
@@ -128,14 +143,35 @@ public class StepsCounter implements SensorObserver {
                 }
             }
 
-            accelRising = isRising;
-            lastAccelZ = z;
+            // Only consider step if acceleration is above lower threshold (gravity baseline)
+            if (filteredAcc < ACCEL_LOWER_THRESHOLD) {
+                accelRising = false;
+            } else {
+                accelRising = isRisingNow;
+            }
+
+            lastFilteredAccel = filteredAcc;
         }
 
         else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            float z = ((XYZFloatSensor) gyroSensor).getZ();
-            lastGyroZ = Math.abs(z);
+            XYZFloatSensor g = (XYZFloatSensor) gyroSensor;
+            lastGyroMagnitude = computeResultant(g.getX(), g.getY(), g.getZ());
         }
+    }
+
+    private float computeResultant(float x, float y, float z) {
+        return (float) Math.sqrt(x * x + y * y + z * z);
+    }
+
+    private float applyMedianFilter(float newValue) {
+        if (accelBuffer.size() >= FILTER_WINDOW_SIZE) {
+            accelBuffer.poll();
+        }
+        accelBuffer.offer(newValue);
+
+        Float[] arr = accelBuffer.toArray(new Float[0]);
+        Arrays.sort(arr);
+        return arr[arr.length / 2];
     }
 
     public int getCurrentStepCount() {
