@@ -12,6 +12,7 @@ import com.littlebits.sensorapp.model.Workout;
 import com.littlebits.sensorapp.repository.SensorRepository;
 import com.littlebits.sensorapp.sensor.SensorObserver;
 import com.littlebits.sensorapp.sensor.XYZFloatSensor;
+import com.littlebits.sensorapp.ui.WorkoutActivity;
 import com.littlebits.sensorapp.util.ActivityClassifier;
 import com.littlebits.sensorapp.util.AltitudeCounter;
 import com.littlebits.sensorapp.util.CalorieCounter;
@@ -120,17 +121,14 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
                 ax.add(accelerometer.getX());
                 ay.add(accelerometer.getY());
                 az.add(accelerometer.getZ());
-                break;
             case Sensor.TYPE_GYROSCOPE:
                 gx.add(gyroscope.getX());
                 gy.add(gyroscope.getY());
                 gz.add(gyroscope.getZ());
-                break;
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 lx.add(linearAcceleration.getX());
                 ly.add(linearAcceleration.getY());
                 lz.add(linearAcceleration.getZ());
-                break;
         }
 
         predictActivity();
@@ -154,6 +152,10 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         for (int i = 0; i < data.size(); i++) input[i] = data.get(i);
 
         currentActivity = classifier.getTopPrediction(input);
+
+        if (context instanceof WorkoutActivity) {
+            ((WorkoutActivity) context).setActivityIcon(currentActivity.getLabel());
+        }
 
         // Notify CalorieCounter about the updated activity
         calorieCounter.updateActivity(currentActivity);
@@ -225,7 +227,7 @@ public class WorkoutManager implements WorkoutTimer.TimerListener, SensorObserve
         workout.setSteps(stepsCounter.getCurrentStepCount());
         workout.setDistance(distanceCounter.getCurrentDistance());
         workout.setSpeed(speedCounter.getAverageSpeed());
-        workout.setAltitude(altitudeCounter.getCumulativeAltitudeGain());
+        workout.setAltitude(altitudeCounter.getFusedAltitude());
         workout.setCalories(calorieCounter.getTotalCalories());
 
         return workout;
