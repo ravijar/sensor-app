@@ -15,9 +15,9 @@ import java.nio.channels.FileChannel;
 public class ActivityClassifier {
 
     private static final String MODEL_FILE = "model.tflite";
-    public static final int INPUT_LENGTH = 100; // time steps
-    public static final int INPUT_WIDTH = 9;    // features per step
-    public static final int OUTPUT_SIZE = 7;    // 7 activity classes
+    private static final int INPUT_LENGTH = 100; // time steps
+    private static final int INPUT_WIDTH = 9;    // features per step
+    private static final int OUTPUT_SIZE = 7;    // 7 activity classes
 
     private final Interpreter interpreter;
 
